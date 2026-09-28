@@ -1,0 +1,14 @@
+{
+  "name": "repair-os",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Private single-operator OS & financial engine for on-demand mobile electronics repair",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "db:init": "node server/init-db.js",
+    "test": "node --test server/"
+  },
+  "dependencies": { "express": "^4.19.2", "pg": "^8.12.0" },
+  "engines": { "node": ">=18" }
+}
