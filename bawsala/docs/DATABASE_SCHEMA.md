@@ -52,10 +52,10 @@ Conventions: `uuid` PKs default to `gen_random_uuid()`, `bigserial` for append-o
 |---|---|---|---|
 | id | uuid | PK | |
 | email | citext | UNIQUE NOT NULL, length ≤ 254 | stored lower-cased by the app |
-| password_hash | text | NOT NULL | `scrypt$N$r$p$salt$key` (N=2^15, r=8, p=1, 64-byte key) |
+| password_hash | text | NOT NULL | `scrypt$N$r$p$salt$key` (N=2^15, r=8, p=3, 64-byte key). Hashes with older parameters are re-hashed at the next successful sign-in. |
 | name | text | NOT NULL, length 1–120 | |
 | locale | text | NOT NULL default `'ar'`, IN (`ar`,`ary`,`fr`,`en`,`zgh`) | UI and email language |
-| role | user_role | NOT NULL default `student` | emails in `ADMIN_EMAILS` become `platform_admin` at sign-up |
+| role | user_role | NOT NULL default `student` | sign-up always creates `student`. `platform_admin` is granted by an operator with `npm run admin:grant -- <email>` (`scripts/make-admin.ts`; `--revoke` sets the account back to `student`; both reset the user's sessions and write an `admin.granted`/`admin.revoked` audit entry). `institution_admin` is set with `PATCH /api/v1/admin/users/:id`. |
 | institution_id | uuid | → institutions (SET NULL) | |
 | email_verified_at | timestamptz | | not written by current code |
 | last_active_at | timestamptz | | updated by session validation, at most every 10 min |
@@ -68,7 +68,7 @@ Conventions: `uuid` PKs default to `gen_random_uuid()`, `bigserial` for append-o
 | id | text | PK | SHA-256 hex of the cookie token (raw token only exists in the cookie) |
 | user_id | uuid | NOT NULL → users (CASCADE) | |
 | created_at | timestamptz | now() | |
-| expires_at | timestamptz | NOT NULL | 30 days from creation; extended to now+30 d when < 15 d remain |
+| expires_at | timestamptz | NOT NULL | 30 days from creation; extended to now+30 d when < 15 d remain, but never past `created_at` + 90 d (sessions older than 90 d are deleted on use) |
 | last_seen_at | timestamptz | now() | updated on renewal |
 | user_agent | text | | truncated to 300 chars |
 | ip | text | | truncated to 64 chars |
@@ -88,7 +88,7 @@ Conventions: `uuid` PKs default to `gen_random_uuid()`, `bigserial` for append-o
 
 | Column | Type | Constraints / default | Meaning |
 |---|---|---|---|
-| key | text | PK part | e.g. `signin:ip:<ip>`, `chat:min:<userId>` |
+| key | text | PK part | e.g. `signin:ip:<ip>`, `signin:fail:<email>`, `chat:min:<userId>`, `chat:day:<userId>` (the daily AI quota). Keys contain IP addresses and emails. |
 | window_start | timestamptz | PK part | start of the window, aligned to the window length |
 | count | integer | NOT NULL default 0 | incremented with `INSERT … ON CONFLICT DO UPDATE` |
 
@@ -215,7 +215,7 @@ Rows older than 1 day, and expired `sessions`, are deleted by `pruneRateLimits()
 | | | CHECK `is_sample OR source_url IS NOT NULL` | real opportunities must cite a source |
 | | | CHECK `opp_demo_consistent`: `(verification_status = 'demo') = is_sample` | |
 
-Student listings (`listOpportunities`) show only rows with `status='published'`, `expires_at` NULL or in the future, and `deadline` NULL or ≥ today.
+Students only see rows with `status='published'`, `expires_at` NULL or in the future, and `deadline` NULL or ≥ today, both in listings (`listOpportunities`) and in single lookups (`getOpportunity`). Admin opportunity writes are rejected (422) if any requirement `skill_id` is not in `skills`.
 
 **`opportunity_skills`**
 
@@ -231,7 +231,7 @@ Student listings (`listOpportunities`) show only rows with `status='published'`,
 |---|---|---|---|
 | user_id | uuid | PK part → users (CASCADE) | |
 | opportunity_id | uuid | PK part → opportunities (CASCADE) | |
-| status | text | NOT NULL default `saved`, IN (`saved`,`preparing`,`applied`) | `preparing` is set by the assistant's `application_assistant` tool; `applied` is never set |
+| status | text | NOT NULL default `saved`, IN (`saved`,`preparing`,`applied`) | current code only writes `saved`; `preparing` and `applied` are never set |
 | created_at | timestamptz | now() | |
 
 ### 2.5 Plans
@@ -298,7 +298,7 @@ Saving a new plan archives the current active plan (plans are never deleted). A 
 | citations *(003)* | jsonb | NOT NULL default `[]` | `[{n,title,source,url,status,verified_at}]` |
 | prompt_version *(003)* | text | | e.g. `chat-2026-11-02.1`, or `basic` |
 
-The daily AI quota counts `role='user'` rows from the last 24 h.
+The daily AI quota is not counted from this table. It uses the `rate_limits` key `chat:day:<userId>` (see API_DOCUMENTATION.md §2.9). `GET /api/v1/me` still reports `messagesToday` as the number of `role='user'` rows in the last 24 h.
 
 **`pending_actions`**: effects the assistant proposes. They are applied only after the student confirms.
 
@@ -353,7 +353,7 @@ The daily AI quota counts `role='user'` rows from the last 24 h.
 | embedding_model | text | | vector search only uses chunks whose model matches the current embedder |
 | created_at | timestamptz | now() | |
 
-Note: the column is fixed at 384 dimensions, which matches the local `multilingual-e5-small` embedder. The optional Voyage embedder in `src/server/rag/embedder.ts` declares 1024 dimensions and would not fit this column without a migration.
+Note: the column is fixed at 384 dimensions, which matches the local `multilingual-e5-small` embedder. `ingestDocument` refuses to run with any embedder whose `dims` is not 384; the optional Voyage embedder produces 1024, so switching to it needs a migration first.
 
 **`retrieval_log`**: one row per retrieval. Stores the query hash, never the query text.
 
@@ -462,7 +462,7 @@ Note: the column is fixed at 384 dimensions, which matches the local `multilingu
 | user_skill_id | uuid | NOT NULL → user_skills (CASCADE) | |
 | institution_id | uuid | NOT NULL → institutions (CASCADE) | |
 | note | text | length ≤ 1000 | student's note |
-| status | text | NOT NULL default `pending`, IN (`pending`,`approved`,`rejected`) | |
+| status | text | NOT NULL default `pending`, IN (`pending`,`approved`,`rejected`) | when a student leaves the institution, their pending requests become `rejected` with `review_note = 'student left the institution'` |
 | reviewer_id | uuid | → users (SET NULL) | |
 | review_note | text | length ≤ 1000 | |
 | created_at | timestamptz | now() | |
@@ -475,7 +475,7 @@ Note: the column is fixed at 384 dimensions, which matches the local `multilingu
 |---|---|---|---|
 | id | bigserial | PK | |
 | user_id | uuid | → users (SET NULL) | |
-| feature | text | NOT NULL | `chat` or `skill_extraction` |
+| feature | text | NOT NULL | `chat` or `skill_extraction`. The sum of `est_cost_usd` since 00:00 UTC is compared with `AI_DAILY_BUDGET_USD` to decide whether chat runs in basic mode. |
 | engine | text | NOT NULL | provider id (`anthropic`) |
 | input_tokens / output_tokens | integer | NOT NULL default 0 | |
 | ok | boolean | NOT NULL | |
@@ -517,13 +517,13 @@ Status order: `declared` < `inferred` < `evidenced` < `verified`. All writes go 
 | declared | the student says they have it, with no proof | `POST /skills` | `declareSkill` (source `user`); unknown skill id → 422 `unknown_skill` |
 | inferred | detected in the student's own words, then confirmed by them | `POST /suggestions/:id/accept` | `acceptSuggestion` marks the suggestion `accepted`, upserts `inferred` (source = suggestion's `ai`/`rules`), adds evidence `kind='quote'` |
 | evidenced | at least one proof is attached | `POST /skills/:id/evidence` (`project`/`link`/`certificate`) **or** completing a `prove`/`project` plan task with a `skill_id` and a proof URL or note | `addEvidence` upserts `evidenced`, sets `declared`/`inferred` → `evidenced`, inserts evidence (task proof uses `kind='task'` and `plan_task_id`). If the skill was not in the passport, it is created directly as `evidenced`. |
-| verified | a human at the student's institution confirmed it | student `POST /skills/:id/verify-request`, then institution admin `POST /institution/verifications/:id` with `approved` | `reviewVerification` (`src/server/repo/institution.ts`) sets `status='verified'` on approval (from any prior state); `rejected` leaves the skill unchanged |
+| verified | a human at the student's institution confirmed it | student `POST /skills/:id/verify-request`, then institution admin `POST /institution/verifications/:id` with `approved` | `reviewVerification` (`src/server/repo/institution.ts`) acts only while the request is `pending`, belongs to the reviewer's institution, and the student is still a member with `share_with_institution = true`. Approval sets `status='verified'` (from any prior state); `rejected` leaves the skill unchanged. |
 
 Other rules:
 - Suggestions come from `POST /experiences/:id/analyze` and the assistant's `analyze_skills` tool. They exclude skills already in the passport. LLM suggestions are kept only when the skill id is in the catalogue and the quote appears in the text. Rejecting one only sets `status='rejected'`.
 - `DELETE /skills/:skillId` deletes the `user_skills` row, which cascades to its evidence and verification requests.
 - Reopening a plan task does not remove evidence that the task already produced.
-- The verification queue shows only requests where the student still belongs to the institution and has `share_with_institution = true`. Creating a request turns sharing on.
+- The verification queue, and the review itself, only cover students who still belong to the institution and have `share_with_institution = true`. Creating a request turns sharing on. Leaving the institution turns sharing off and rejects pending requests.
 
 ## 4. Row-level security
 
@@ -543,7 +543,7 @@ Every table in the migrations runs `ENABLE` and `FORCE ROW LEVEL SECURITY`. The 
 
 What these policies imply in practice:
 - In the app, all event, usage, retrieval-log and feedback writes go through `asSystem`; the "own insert" policies are not used by current code.
-- `read_all` on `opportunities` also exposes `draft`/`archived` rows at the database level. Filtering by `status` is done in `listOpportunities()`.
+- `read_all` on `opportunities` also exposes `draft`/`archived` rows at the database level. Visibility (published, unexpired, deadline not passed) is enforced in application code by `listOpportunities()` and `getOpportunity()` unless they are called with `includeUnpublished` (admin listing only).
 - `read_all` on `institutions` makes `join_code` readable from any context, including `asPublic`. No public API returns it.
 - `kb_chunks` stays readable after its document is archived. Retrieval queries join `kb_documents` and filter `status = 'active'`.
 

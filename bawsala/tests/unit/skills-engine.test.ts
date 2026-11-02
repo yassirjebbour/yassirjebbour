@@ -29,7 +29,7 @@ describe("deterministic skill engine", () => {
       const got = new Set(detectSkills(c.text).map((d) => d.skillId));
       const exp = new Set(c.expected);
       const m = byLang.get(c.lang) ?? { tp: 0, fp: 0, fn: 0 };
-      for (const g of got) (exp.has(g) ? m.tp++ : m.fp++);
+      for (const g of got) { if (exp.has(g)) m.tp++; else m.fp++; }
       for (const e of exp) if (!got.has(e)) m.fn++;
       byLang.set(c.lang, m);
     }

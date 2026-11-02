@@ -9,9 +9,22 @@ export type NotificationKind = "task_due" | "plan_ready" | "skill_suggestions" |
 
 /** In-app notification. `dedupeKey` prevents duplicates (e.g. one "task due" per task per day). */
 export async function notify(userId: string, kind: NotificationKind, data: Record<string, unknown>, dedupeKey?: string) {
-  await asSystem((tx) =>
-    tx.query(`INSERT INTO notifications (user_id, kind, data, dedupe_key) VALUES ($1,$2,$3,$4) ON CONFLICT (user_id, dedupe_key) DO NOTHING`, [userId, kind, JSON.stringify(data), dedupeKey ?? null]),
-  ).catch((e) => log.warn("notify.failed", { kind, err: e }));
+  await asSystem(async (tx) => {
+    // Security notices are always shown; everything else respects the in-app preference.
+    if (kind !== "security") {
+      const pref = await tx.one<{ in_app: boolean }>(`SELECT in_app FROM notification_prefs WHERE user_id = $1`, [userId]);
+      if (pref && !pref.in_app) return;
+    }
+    await tx.query(`INSERT INTO notifications (user_id, kind, data, dedupe_key) VALUES ($1,$2,$3,$4) ON CONFLICT (user_id, dedupe_key) DO NOTHING`, [userId, kind, JSON.stringify(data), dedupeKey ?? null]);
+  }).catch((e) => log.warn("notify.failed", { kind, err: e }));
+}
+
+/** Security emails (password changed) respect the user's opt-out; delivered immediately, not by the daily job. */
+export async function sendSecurityEmail(user: { id: string; email: string; name: string; locale: Locale }, link: string) {
+  const pref = await asSystem((tx) => tx.one<{ email_security: boolean }>(`SELECT email_security FROM notification_prefs WHERE user_id = $1`, [user.id]));
+  if (pref && !pref.email_security) return;
+  await enqueueEmail({ userId: user.id, to: user.email, template: "password_changed", locale: user.locale, data: { name: user.name, link } });
+  deliverOutbox(5).catch(() => {});
 }
 
 export const listNotifications = (userId: string) =>

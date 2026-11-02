@@ -47,7 +47,7 @@ describe("i18n catalogues", () => {
   it("Tamazight catalogue is written in Tifinagh (Latin only for names/codes)", () => {
     const latinWords = leaves(zgh).flatMap(([, v]) => (typeof v === "string" ? [v] : Object.values(v as Dict) as string[]))
       .join(" ").replace(/\{\w+\}|https?:\S+/g, "").match(/\b[A-Za-z]{4,}\b/g) ?? [];
-    const allowed = /^(BAWSALA|Excel|JSON|PDF|DOCX|ANAPEC|OFPPT|HubSpot|Instagram|LinkedIn|GitHub|English|Français|North|Star|https|CEFR|Europass)$/i;
+    const allowed = /^(BAWSALA|Excel|JSON|PDF|DOCX|ANAPEC|OFPPT|HubSpot|Instagram|LinkedIn|GitHub|English|Français|North|Star|https|CEFR|Europass|Word|Google|Docs)$/i;
     expect([...new Set(latinWords.filter((w) => !allowed.test(w)))]).toEqual([]);
   });
 

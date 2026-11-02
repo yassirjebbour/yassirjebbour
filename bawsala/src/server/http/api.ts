@@ -84,22 +84,24 @@ type Handler<C> = (req: Request, ctx: C) => Promise<Response>;
 export function route<C = unknown>(fn: Handler<C>): Handler<C> {
   return async (req, ctx) => {
     const started = Date.now();
+    const requestId = crypto.randomUUID();
+    const withId = (res: Response) => { try { res.headers.set("X-Request-Id", requestId); } catch { /* immutable */ } return res; };
     try {
       assertSameOrigin(req);
-      return await fn(req, ctx);
+      return withId(await fn(req, ctx));
     } catch (e) {
       if (e instanceof z.ZodError) {
-        return json({ error: { code: "validation", message: "Invalid input", details: e.issues.map((i) => ({ path: i.path.join("."), message: i.message })) } }, { status: 422 });
+        return withId(json({ error: { code: "validation", message: "Invalid input", details: e.issues.map((i) => ({ path: i.path.join("."), message: i.message })) } }, { status: 422 }));
       }
       if (e instanceof ApiError) {
-        return json(
+        if (e.status >= 500) log.warn("api.error", { requestId, code: e.code, path: new URL(req.url).pathname });
+        return withId(json(
           { error: { code: e.code, message: e.message, details: e.details } },
           { status: e.status, headers: e.retryAfter ? { "Retry-After": String(e.retryAfter) } : undefined },
-        );
+        ));
       }
-      const ref = Math.random().toString(36).slice(2, 10);
-      log.error("api.unhandled", { ref, path: new URL(req.url).pathname, method: req.method, ms: Date.now() - started, err: e });
-      return json({ error: { code: "internal", message: "Something went wrong", ref } }, { status: 500 });
+      log.error("api.unhandled", { requestId, path: new URL(req.url).pathname, method: req.method, ms: Date.now() - started, err: e });
+      return withId(json({ error: { code: "internal", message: "Something went wrong", ref: requestId } }, { status: 500 }));
     }
   };
 }

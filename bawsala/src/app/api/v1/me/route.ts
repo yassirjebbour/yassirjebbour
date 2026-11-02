@@ -4,14 +4,14 @@ import { route, readJson, json, apiUser } from "@/server/http/api";
 import { zLocale, zName } from "@/server/http/schemas";
 import { deleteAccount, setLocale, updateName } from "@/server/repo/account";
 import { SESSION_COOKIE } from "@/server/auth/session";
-import { messagesToday } from "@/server/repo/conversations";
+import { rateLimitCount } from "@/server/ratelimit";
 import { env } from "@/server/env";
 import { LOCALE_COOKIE } from "@/i18n/config";
 import { track } from "@/server/events";
 
 export const GET = route(async () => {
   const user = await apiUser();
-  return json({ user, ai: { messagesToday: await messagesToday(user.id), dailyLimit: env().AI_DAILY_MESSAGES_PER_USER } });
+  return json({ user, ai: { messagesToday: await rateLimitCount(`chat:day:${user.id}`, 86_400), dailyLimit: env().AI_DAILY_MESSAGES_PER_USER } });
 });
 
 const Patch = z.object({ name: zName.optional(), locale: zLocale.optional() });

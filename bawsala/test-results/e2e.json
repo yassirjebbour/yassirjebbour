@@ -3,8 +3,7 @@
     "argv": [
       "/opt/node22/bin/node",
       "/home/user/yassirjebbour/bawsala/node_modules/.bin/playwright",
-      "test",
-      "--project=desktop"
+      "test"
     ],
     "configFile": "/home/user/yassirjebbour/bawsala/playwright.config.ts",
     "rootDir": "/home/user/yassirjebbour/bawsala/tests/e2e",
@@ -17,14 +16,18 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {},
+    "metadata": {
+      "actualWorkers": 1
+    },
     "preserveOutput": "always",
     "projects": [
       {
         "outputDir": "/home/user/yassirjebbour/bawsala/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "desktop",
         "name": "desktop",
         "testDir": "/home/user/yassirjebbour/bawsala/tests/e2e",
@@ -38,7 +41,9 @@
         "outputDir": "/home/user/yassirjebbour/bawsala/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "mobile",
         "name": "mobile",
         "testDir": "/home/user/yassirjebbour/bawsala/tests/e2e",
@@ -84,17 +89,199 @@
       }
     }
   },
-  "suites": [],
-  "errors": [
+  "suites": [
     {
-      "message": "Error: Process from config.webServer was not able to start. Exit code: 1",
-      "stack": "Error: Process from config.webServer was not able to start. Exit code: 1"
+      "title": "journey.spec.ts",
+      "file": "journey.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "full student journey: signup → onboarding → passport → path → assistant → persistence → export → delete @mobile",
+          "ok": true,
+          "tags": [
+            "mobile"
+          ],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6425,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-02T01:32:03.476Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bf222bad70f76648f722-5a9d77ed2a0524ce6ced",
+          "file": "journey.spec.ts",
+          "line": 30,
+          "column": 5
+        },
+        {
+          "title": "Arabic is RTL, Darija RTL, Tamazight renders Tifinagh LTR with the Tifinagh font",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 932,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-02T01:32:09.984Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bf222bad70f76648f722-9dede47e8912a80d2f30",
+          "file": "journey.spec.ts",
+          "line": 110,
+          "column": 5
+        },
+        {
+          "title": "accessibility: no serious or critical axe violations on key pages",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5463,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "[a11y] {\"/\":[],\"/signin\":[],\"/app/onboarding\":[],\"/app\":[],\"/app/passport\":[],\"/app/opportunities\":[],\"/app/assistant\":[],\"/app/settings\":[]}\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-02T01:32:10.924Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bf222bad70f76648f722-a9bc7cccc815208b0588",
+          "file": "journey.spec.ts",
+          "line": 127,
+          "column": 5
+        },
+        {
+          "title": "authorization boundaries over HTTP: other students, institution and admin areas",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1912,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-02T01:32:16.394Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bf222bad70f76648f722-6ae0950bc4a176e32d64",
+          "file": "journey.spec.ts",
+          "line": 140,
+          "column": 5
+        },
+        {
+          "title": "full student journey: signup → onboarding → passport → path → assistant → persistence → export → delete @mobile",
+          "ok": true,
+          "tags": [
+            "mobile"
+          ],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile",
+              "projectName": "mobile",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4952,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-02T01:32:18.738Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bf222bad70f76648f722-3e774ee4ed23c3268f74",
+          "file": "journey.spec.ts",
+          "line": 30,
+          "column": 5
+        }
+      ]
     }
   ],
+  "errors": [],
   "stats": {
-    "startTime": "2026-11-02T01:25:27.881Z",
-    "duration": 413.42,
-    "expected": 0,
+    "startTime": "2026-11-02T01:32:02.429Z",
+    "duration": 21456.933,
+    "expected": 5,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

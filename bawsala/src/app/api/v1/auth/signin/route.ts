@@ -16,10 +16,14 @@ export const POST = route(async (req) => {
   const body = await readJson(req, Body);
   // Two limits: per IP (credential stuffing) and per account (targeted guessing). The per-account
   // limit counts only FAILED attempts, so successful sign-ins never lock the owner out.
+  // Failures are counted per (account, IP) — a single attacker cannot lock the owner out from another
+  // network — with a higher per-account ceiling against distributed guessing.
   await rateLimit(`signin:ip:${ip}`, 20, 900);
-  await rateLimitPeek(`signin:fail:${body.email}`, 8, 900);
+  await rateLimitPeek(`signin:fail:${body.email}:${ip}`, 8, 900);
+  await rateLimitPeek(`signin:fail:${body.email}`, 50, 900);
   const userId = await checkCredentials(body.email, body.password);
   if (!userId) {
+    await rateLimit(`signin:fail:${body.email}:${ip}`, 1_000_000, 900);
     await rateLimit(`signin:fail:${body.email}`, 1_000_000, 900);
     throw new ApiError("unauthorized", "invalid_credentials");
   }

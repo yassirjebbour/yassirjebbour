@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getT } from "@/i18n/server";
 import { LanguageSwitcher, ThemeToggle } from "./language-switcher";
 import { getCurrentUser } from "@/server/auth/current";
@@ -9,7 +10,7 @@ export async function PublicHeader() {
   return (
     <header className="pub-head">
       <div className="container">
-        <Link href="/" className="brand" aria-label="BAWSALA"><img src="/brand/bawsala-app-icon.svg" alt="" width={28} height={28} /><span>BAWSALA</span></Link>
+        <Link href="/" className="brand" aria-label="BAWSALA"><Image src="/brand/bawsala-app-icon.svg" alt="" width={28} height={28} unoptimized priority /><span>BAWSALA</span></Link>
         <nav className="row" aria-label="BAWSALA">
           <LanguageSwitcher compact />
           <ThemeToggle />

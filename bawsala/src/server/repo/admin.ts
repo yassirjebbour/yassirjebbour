@@ -12,8 +12,8 @@ export async function adminOverview() {
              (SELECT count(*) FROM profiles WHERE target_opportunity_id IS NOT NULL AND user_id IN (SELECT user_id FROM s))::int target,
              (SELECT count(DISTINCT user_id) FROM plans WHERE user_id IN (SELECT user_id FROM s))::int plan,
              (SELECT count(DISTINCT user_id) FROM plan_tasks WHERE completed_at IS NOT NULL AND user_id IN (SELECT user_id FROM s))::int task`);
-    const wau = await tx.one<{ n: number }>(`SELECT count(DISTINCT user_id)::int n FROM events WHERE user_id IS NOT NULL AND created_at > now() - interval '7 days'`);
-    const northStar = await tx.one<{ n: number }>(`SELECT count(DISTINCT user_id)::int n FROM plan_tasks WHERE completed_at > now() - interval '7 days' AND kind IN ('prove','project')`);
+    const wau = await tx.one<{ n: number }>(`SELECT count(DISTINCT e.user_id)::int n FROM events e JOIN users u ON u.id = e.user_id AND u.role = 'student' WHERE e.created_at > now() - interval '7 days'`);
+    const northStar = await tx.one<{ n: number }>(`SELECT count(DISTINCT t.user_id)::int n FROM plan_tasks t JOIN users u ON u.id = t.user_id AND u.role = 'student' WHERE t.completed_at > now() - interval '7 days' AND t.kind IN ('prove','project')`);
     const users = await tx.one<{ total: number; students: number }>(`SELECT count(*)::int total, count(*) FILTER (WHERE role = 'student')::int students FROM users`);
     const ai = await tx.query<{ feature: string; engine: string; calls: number; errors: number; cost: string; p50: number | null; tokens_in: number; tokens_out: number }>(`
       SELECT feature, engine, count(*)::int calls, count(*) FILTER (WHERE NOT ok)::int errors, coalesce(sum(est_cost_usd),0)::text cost,

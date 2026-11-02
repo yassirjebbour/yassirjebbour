@@ -4,6 +4,8 @@ import { hashPassword, verifyPassword, needsRehash, DUMMY_HASH } from "../auth/p
 import { ApiError } from "../http/errors";
 import type { Locale } from "@/i18n/config";
 
+export const TERMS_VERSION = "pilot-2026-11-02";
+
 export async function signUp(input: { email: string; password: string; name: string; locale: Locale; joinCode?: string | null }) {
   const email = input.email.trim().toLowerCase();
   const passwordHash = await hashPassword(input.password);
@@ -17,8 +19,8 @@ export async function signUp(input: { email: string; password: string; name: str
       institutionId = inst.id;
     }
     const user = await tx.one<{ id: string }>(
-      `INSERT INTO users (email, password_hash, name, locale, role, institution_id) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id`,
-      [email, passwordHash, input.name.trim(), input.locale, "student", institutionId],
+      `INSERT INTO users (email, password_hash, name, locale, role, institution_id, terms_accepted_at, terms_version) VALUES ($1,$2,$3,$4,$5,$6, now(), $7) RETURNING id`,
+      [email, passwordHash, input.name.trim(), input.locale, "student", institutionId, TERMS_VERSION],
     );
     await tx.query(`INSERT INTO profiles (user_id) VALUES ($1)`, [user!.id]);
     await tx.query(`INSERT INTO audit_log (actor_id, action) VALUES ($1, 'account.created')`, [user!.id]);
@@ -45,6 +47,7 @@ export async function changePassword(userId: string, current: string, next: stri
   await asUser(userId, (tx) => tx.query(`UPDATE users SET password_hash = $2 WHERE id = $1`, [userId, hash]));
   await asSystem(async (tx) => {
     await tx.query(`DELETE FROM sessions WHERE user_id = $1 AND id IS DISTINCT FROM $2`, [userId, keepSessionId ?? null]);
+    await tx.query(`UPDATE auth_tokens SET used_at = now() WHERE user_id = $1 AND purpose = 'password_reset' AND used_at IS NULL`, [userId]);
     await tx.query(`INSERT INTO audit_log (actor_id, action) VALUES ($1, 'account.password_changed')`, [userId]);
   });
 }
@@ -61,7 +64,7 @@ export async function updateName(userId: string, name: string) {
 export async function exportAccount(userId: string) {
   return asUser(userId, async (tx) => {
     const q = (sql: string) => tx.query(sql, [userId]);
-    const [user] = await q(`SELECT id, email, name, locale, role, created_at, last_active_at FROM users WHERE id = $1`);
+    const [user] = await q(`SELECT id, email, name, locale, role, created_at, last_active_at, terms_accepted_at, terms_version FROM users WHERE id = $1`);
     return {
       exported_at: new Date().toISOString(),
       format: "bawsala-export/1",
@@ -92,6 +95,8 @@ export async function deleteAccount(userId: string, password: string) {
   if (!row || !(await verifyPassword(password, row.password_hash))) throw new ApiError("validation", "wrong_password");
   await asSystem(async (tx) => {
     await tx.query(`INSERT INTO audit_log (actor_id, action, target) VALUES (NULL, 'account.deleted', $1)`, [userId]);
+    await tx.query(`DELETE FROM feedback WHERE user_id = $1`, [userId]); // free text written by the student
+    await tx.query(`DELETE FROM email_outbox WHERE user_id = $1`, [userId]);
     await tx.query(`DELETE FROM users WHERE id = $1`, [userId]);
   });
 }

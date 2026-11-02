@@ -50,7 +50,7 @@ function prf(results: Array<{ got: string[]; expected: string[]; forbidden?: str
   let tp = 0, fp = 0, fn = 0, forbidden = 0;
   for (const r of results) {
     const exp = new Set(r.expected);
-    for (const g of r.got) (exp.has(g) ? tp++ : fp++);
+    for (const g of r.got) { if (exp.has(g)) tp++; else fp++; }
     for (const e of exp) if (!r.got.includes(e)) fn++;
     for (const f of r.forbidden ?? []) if (r.got.includes(f)) forbidden++;
   }

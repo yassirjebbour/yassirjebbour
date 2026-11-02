@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getT } from "@/i18n/server";
 import { Rail, TabBar, SignOutButton } from "./nav";
 import { LanguageSwitcher, ThemeToggle } from "../language-switcher";
@@ -14,7 +15,7 @@ export async function AppShell({ user, children }: { user: SessionUser; children
       <Rail unread={unread} role={user.role} />
       <div>
         <header className="topbar">
-          <Link href="/app" className="brand"><img src="/brand/bawsala-app-icon.svg" alt="" width={26} height={26} /><span>BAWSALA</span></Link>
+          <Link href="/app" className="brand"><Image src="/brand/bawsala-app-icon.svg" alt="" width={26} height={26} unoptimized priority /><span>BAWSALA</span></Link>
           <span />
           <div className="row" style={{ gap: 4 }}>
             <LanguageSwitcher compact />

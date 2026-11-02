@@ -3,7 +3,7 @@ import { makeUser } from "../support/factory";
 import { checkCredentials, exportAccount, deleteAccount, changePassword } from "@/server/repo/account";
 import { createExperience } from "@/server/repo/experiences";
 import { analyzeText } from "@/server/ai/analysis";
-import { addSuggestions, pendingSuggestions, acceptSuggestion, rejectSuggestion, getPassport, addEvidence } from "@/server/repo/skills";
+import { addSuggestions, pendingSuggestions, acceptSuggestion, rejectSuggestion, getPassport } from "@/server/repo/skills";
 import { rankedForUser, getOpportunity } from "@/server/repo/opportunities";
 import { setTarget, getProfile, updateProfile } from "@/server/repo/profile";
 import { draftPlanFor, savePlan, getActivePlan, completeTask, progressStats } from "@/server/repo/plans";

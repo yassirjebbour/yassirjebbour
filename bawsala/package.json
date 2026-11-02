@@ -18,7 +18,8 @@
     "eval:ai": "node --conditions=react-server --import tsx scripts/ai-eval.ts",
     "setup": "npm run db:migrate && npm run db:seed && npm run kb:ingest",
     "admin:grant": "tsx scripts/make-admin.ts",
-    "rag:debug": "node --conditions=react-server --import tsx scripts/rag-debug.ts"
+    "rag:debug": "node --conditions=react-server --import tsx scripts/rag-debug.ts",
+    "models:fetch": "tsx scripts/fetch-embedding-model.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0",
@@ -48,5 +49,8 @@
     "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

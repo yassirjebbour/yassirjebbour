@@ -17,17 +17,23 @@ export function AdminConsole() {
   const toast = useToast();
   const err = useErrorMessage();
   const [tab, setTab] = useState<"flags" | "users" | "institutions" | "opportunities" | "knowledge" | "feedback" | "audit">("flags");
-  const [data, setData] = useState<unknown[] | null>(null);
+  const [loaded, setLoaded] = useState<{ key: string; data: unknown[] } | null>(null);
   const [reload, setReload] = useState(0);
   const path = { flags: "/admin/flags", users: "/admin/users", institutions: "/admin/institutions", opportunities: "/admin/opportunities", knowledge: "/admin/knowledge", feedback: "/admin/feedback", audit: "/admin/audit" }[tab];
-  useEffect(() => { setData(null); api<unknown[]>(path).then(setData).catch((x) => toast(err(x))); }, [path, reload]); // eslint-disable-line react-hooks/exhaustive-deps
+  const key = `${path}#${reload}`;
+  const data = loaded?.key === key ? loaded.data : null;
+  useEffect(() => {
+    let live = true;
+    api<unknown[]>(path).then((d) => { if (live) setLoaded({ key, data: d }); }).catch((x) => toast(err(x)));
+    return () => { live = false; };
+  }, [path, key]); // eslint-disable-line react-hooks/exhaustive-deps
   const act = async (fn: () => Promise<unknown>) => { try { await fn(); toast(t("common.saved")); setReload((n) => n + 1); } catch (x) { toast(err(x)); } };
 
   return (
     <section className="panel stack">
       <div className="chips" role="tablist">
         {(["flags", "users", "institutions", "opportunities", "knowledge", "feedback", "audit"] as const).map((k) => (
-          <button key={k} role="tab" aria-selected={tab === k} className="chip" aria-pressed={tab === k} onClick={() => setTab(k)}>{t(`admin.${k}`)}</button>
+          <button key={k} role="tab" aria-selected={tab === k} className="chip" onClick={() => setTab(k)}>{t(`admin.${k}`)}</button>
         ))}
       </div>
       {data === null ? <div className="skeleton" style={{ height: 120 }} /> : null}

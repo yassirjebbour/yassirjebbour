@@ -73,7 +73,7 @@ export function SettingsView({ name, email, role, institution, prefs, aiUsed, ai
       </section>
 
       <Modal open={del} onClose={() => setDel(false)} title={t("settings.delete")}>
-        <form className="stack" onSubmit={(e) => { e.preventDefault(); const pw = String(new FormData(e.currentTarget).get("pw") ?? ""); run("del", async () => { await api("/me", { method: "DELETE", body: { password: pw } }); toast(t("settings.deleted")); window.location.href = "/"; }); }}>
+        <form className="stack" onSubmit={(e) => { e.preventDefault(); const pw = String(new FormData(e.currentTarget).get("pw") ?? ""); run("del", async () => { await api("/me", { method: "DELETE", body: { password: pw } }); toast(t("settings.deleted")); router.replace("/"); router.refresh(); }); }}>
           <p className="alert alert-err">{t("settings.delete_d")}</p>
           <Field id="pw" label={t("settings.delete_confirm_pw")}><input id="pw" name="pw" type="password" required className="input" dir="ltr" autoComplete="current-password" /></Field>
           <div className="modal-actions"><Button type="button" variant="ghost" onClick={() => setDel(false)}>{t("common.cancel")}</Button><Button type="submit" variant="danger" loading={busy === "del"}>{t("settings.delete")}</Button></div>

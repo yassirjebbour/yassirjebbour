@@ -6,7 +6,7 @@ import { hashToken } from "@/server/auth/tokens";
 import { zPassword } from "@/server/http/schemas";
 import { changePassword } from "@/server/repo/account";
 import { rateLimit } from "@/server/ratelimit";
-import { notify, enqueueEmail } from "@/server/notify";
+import { notify, sendSecurityEmail } from "@/server/notify";
 import { env } from "@/server/env";
 
 const Body = z.object({ current: z.string().min(1).max(200), next: zPassword });
@@ -17,6 +17,6 @@ export const POST = route(async (req) => {
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   await changePassword(user.id, body.current, body.next, token ? hashToken(token) : undefined);
   await notify(user.id, "security", { what: "password" });
-  await enqueueEmail({ userId: user.id, to: user.email, template: "password_changed", locale: user.locale, data: { name: user.name, link: `${env().APP_URL}/forgot` } });
+  await sendSecurityEmail(user, `${env().APP_URL}/forgot`);
   return json({ ok: true });
 });

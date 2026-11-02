@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useI18n } from "../i18n";
@@ -31,7 +32,7 @@ export function Rail({ unread, role }: { unread: number; role: string }) {
   useEffect(() => { track("page.viewed", { page: path.replace(/[0-9a-f-]{36}/g, ":id").slice(0, 60) }); }, [path]);
   return (
     <nav className="rail" aria-label={t("nav.menu")}>
-      <Link href="/app" className="brand"><img src="/brand/bawsala-app-icon.svg" alt="" width={28} height={28} /><span>BAWSALA</span></Link>
+      <Link href="/app" className="brand"><Image src="/brand/bawsala-app-icon.svg" alt="" width={28} height={28} unoptimized priority /><span>BAWSALA</span></Link>
       {MAIN.map((i) => <Link key={i.href} href={i.href} className="nav-link" aria-current={active(path, i.href) ? "page" : undefined}><i.icon />{t(i.key)}</Link>)}
       <div className="nav-sep" />
       {SECONDARY.map((i) => (

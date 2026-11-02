@@ -1,7 +1,8 @@
 /**
  * Structured JSON logging to stdout (collected by the host: Vercel, Fly, Render, Docker…).
  * Never log passwords, tokens, or the content students write; log ids and sizes instead.
- * If SENTRY_DSN is set, errors are also forwarded (see src/instrumentation.ts).
+ * A hosted error tracker is not wired yet (see docs/OBSERVABILITY.md); errors carry a requestId
+ * that is also returned to the client in the X-Request-Id header and the error body (`ref`).
  */
 type Level = "debug" | "info" | "warn" | "error";
 

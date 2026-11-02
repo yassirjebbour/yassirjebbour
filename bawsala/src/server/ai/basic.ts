@@ -18,8 +18,9 @@ const RULES: Array<[IntentKind, RegExp]> = [
   ["progress", R("progress|progrès|avancement|où j'en suis|تقدم|تقدّمي|فين وصلت|fin wselt|t9adom")],
   ["profile", R("profil|profile|improve my|améliorer|حسّن|تحسين|بروفايل")],
   ["resources", R("course|cours|formation gratuite|learn|apprendre|resource|ressource|تعلم|دورة|موارد|nt3lem|t3lem")],
-  ["opportunities", R("job|emploi|stage|internship|opportunit|offre|poste|travail|work|فرص|فرصة|خدمة|شغل|وظيف|تدريب|khdma|lkhdma|stage|t9dar|role|métier")],
+  // Named institutions, programmes and statistics are factual questions → knowledge base first.
   ["knowledge", R("anapec|ofppt|auto[- ]?entrepreneur|مقاول ذاتي|chômage|unemployment|بطالة|hcp|europass|isco|esco|loi|قانون")],
+  ["opportunities", R("job|emploi|stage|internship|opportunit|offre|poste|travail|work|فرص|فرصة|خدمة|خدمات|الخدمات|شغل|وظيف|وظائف|مناسبة ليا|تدريب|khdma|lkhdma|stage|t9dar|role|métier")],
   ["skills", R("skill|compétence|competence|مهار|كفاء|mahara|maharat|analy[sz]|حلل|what can i|qu'est-ce que je sais|شنو نقدر|chno n9der")],
 ];
 
@@ -29,6 +30,8 @@ export function detectIntent(text: string): { kind: IntentKind; calls: Array<{ n
   const cvLike = t.length >= 200 && /@|\+212|\b0[67]\d{8}\b/.test(t);
   let kind: IntentKind = "help";
   if (cvLike) kind = "cv";
+  // A long statement (not a question) is the student describing what they did → skill analysis.
+  else if (long && !/[?؟]/.test(t) && !RULES.find(([k]) => k === "plan")![1].test(t)) kind = "skills";
   else for (const [k, re] of RULES) if (re.test(t)) { kind = k; break; }
   // A long description of something the student did is a skill-analysis request.
   if (kind === "help" && long) kind = "skills";

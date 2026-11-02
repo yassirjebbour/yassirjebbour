@@ -8,6 +8,8 @@ import { isEnabled } from "@/server/flags";
 import { asUser } from "@/server/db";
 import { notify } from "@/server/notify";
 import { track } from "@/server/events";
+import { spentTodayUsd } from "@/server/ai/usage";
+import { env } from "@/server/env";
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -16,7 +18,7 @@ export const POST = route<Ctx>(async (_req, { params }) => {
   const user = await apiUser();
   await rateLimit(`analyze:${user.id}`, 30, 3600);
   const exp = await getExperience(user.id, zUuid.parse((await params).id));
-  const allowLlm = (await isEnabled("ai.llm", user)) && (await isEnabled("ai.analysis", user));
+  const allowLlm = (await isEnabled("ai.llm", user)) && (await isEnabled("ai.analysis", user)) && (await spentTodayUsd()) < env().AI_DAILY_BUDGET_USD;
   const result = await analyzeText(`${exp.title}. ${exp.description}`, { userId: user.id, allowLlm });
   const owned = new Set((await ownedSkills(user.id)).map((s) => s.skillId));
   const created = await addSuggestions(user.id, result.candidates.filter((c) => !owned.has(c.skillId)).map((c) => ({ ...c, experienceId: exp.id })));
