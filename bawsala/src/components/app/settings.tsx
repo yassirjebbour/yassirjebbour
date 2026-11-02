@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useI18n } from "../i18n";
 import { api } from "@/lib/api";
 import { Button, Field, Modal, useErrorMessage, useToast } from "../ui";
-import { LanguageSwitcher } from "../language-switcher";
+import { LanguageSwitcher, ThemeToggle } from "../language-switcher";
+import { SignOutButton } from "./nav";
 
 export function SettingsView({ name, email, role, institution, prefs, aiUsed, aiMax }: { name: string; email: string; role: string; institution: string | null; prefs: { in_app: boolean; email_reminders: boolean; email_security: boolean }; aiUsed: number; aiMax: number }) {
   const { t } = useI18n();
@@ -28,7 +29,7 @@ export function SettingsView({ name, email, role, institution, prefs, aiUsed, ai
           <div style={{ flex: 1, minWidth: 200 }}><Field id="name" label={t("settings.name")}><input id="name" name="name" className="input" defaultValue={name} required maxLength={120} /></Field></div>
           <Button type="submit" variant="secondary" loading={busy === "name"}>{t("common.save")}</Button>
         </form>
-        <div className="field"><span className="label">{t("settings.language")}</span><LanguageSwitcher /></div>
+        <div className="field"><span className="label">{t("settings.language")}</span><div className="row"><LanguageSwitcher /><ThemeToggle /></div></div>
         <p className="small muted">{t("settings.ai_usage", { n: aiUsed, max: aiMax })}</p>
       </section>
 
@@ -71,6 +72,8 @@ export function SettingsView({ name, email, role, institution, prefs, aiUsed, ai
         <hr className="divider" />
         <div className="row-between"><span className="small muted" style={{ maxWidth: 420 }}>{t("settings.delete_d")}</span><Button variant="danger" onClick={() => setDel(true)}>{t("settings.delete")}</Button></div>
       </section>
+
+      <div className="panel"><SignOutButton /></div>
 
       <Modal open={del} onClose={() => setDel(false)} title={t("settings.delete")}>
         <form className="stack" onSubmit={(e) => { e.preventDefault(); const pw = String(new FormData(e.currentTarget).get("pw") ?? ""); run("del", async () => { await api("/me", { method: "DELETE", body: { password: pw } }); toast(t("settings.deleted")); router.replace("/"); router.refresh(); }); }}>

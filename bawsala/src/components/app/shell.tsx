@@ -17,9 +17,8 @@ export async function AppShell({ user, children }: { user: SessionUser; children
         <header className="topbar">
           <Link href="/app" className="brand"><Image src="/brand/bawsala-app-icon.svg" alt="" width={26} height={26} unoptimized priority /><span>BAWSALA</span></Link>
           <span />
-          <div className="row" style={{ gap: 4 }}>
-            <LanguageSwitcher compact />
-            <ThemeToggle />
+          <div className="row" style={{ gap: 4, flexWrap: "nowrap" }}>
+            <span className="hide-sm row" style={{ gap: 4, flexWrap: "nowrap" }}><LanguageSwitcher compact /><ThemeToggle /></span>
             <Link href="/app/notifications" className="btn btn-ghost btn-icon" aria-label={`${t("nav.notifications")}${unread ? ` (${unread})` : ""}`}>
               <IconBell width={20} height={20} />{unread ? <span className="dot num" aria-hidden="true">{unread}</span> : null}
             </Link>

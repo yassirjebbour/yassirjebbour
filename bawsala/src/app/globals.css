@@ -299,3 +299,6 @@ dialog.modal::backdrop { background: var(--scrim); }
 /* Mixed-script content (e.g. a French passage inside an Arabic page): each paragraph takes its
    direction from its own first strong character, so punctuation and alignment stay correct. */
 .md p, .md li, .md blockquote, .md td, .md th, .quote, .bubble, .cite span, .opp-title, .skill-row strong { unicode-bidi: plaintext; text-align: start; }
+
+/* Small phones: keep the top bar on one line; language and theme live in Settings. */
+@media (max-width: 520px) { .hide-sm { display: none !important; } }

@@ -158,9 +158,9 @@ All fixes are in commit `cd84ca0` (branch `claude/nice-brahmagupta-ophs0a`).
 | F-03 | medium | Daily AI quota bypass; no budget | **Fixed** (gaps in THREAT_MODEL T10) | `chat/route.ts:28-33`, `ai/usage.ts:12-15` *(code review)* |
 | F-04 | medium | Body cap bypassed by chunked encoding | **Fixed** | `api.ts:28-57`, `files/route.ts:17-18`; `security.test.ts` "F-04" |
 | F-05 | medium | Parser decompression bomb / CPU | **Partly fixed** (DOCX pre-check). **Open** for PDF and for zip directories that lie about sizes | `files.ts:40-57,68`; `security.test.ts` "F-05" |
-| F-06 | low | Signin lockout of the account owner | **Partly fixed**: only failures count, but 8 attacker failures still block the owner for ≤15 min (the peek runs before the password check) | `signin/route.ts:19-24` *(code review)* |
+| F-06 | low | Signin lockout of the account owner | **Fixed** (commit after e852ec0): failures are counted per (account, IP) with limit 8/15 min plus a per-account ceiling of 50/15 min, so one attacker network cannot lock the owner out; the owner's own 8 typos from one network still pause sign-in for ≤15 min (accepted) | `signin/route.ts` |
 | F-07 | low | Approving a request after the student left | **Fixed** | `institution.ts:44-58`, `me/institution/route.ts:24`; `tests/integration/institution.test.ts` "F-07" |
-| F-08 | low | Password change keeps other sessions | **Partly fixed**: sessions are revoked, but other unused reset tokens are still valid | `account.ts:40-49`, `me/password/route.ts:18` *(code review)* |
+| F-08 | low | Password change keeps other sessions / reset tokens | **Fixed**: other sessions revoked on change; all outstanding reset tokens invalidated on reset and on change | `account.ts` changePassword, `auth/reset/route.ts` |
 | F-09 | low | CSRF check trusted `X-Forwarded-Host` | **Fixed** | `api.ts:15-25`; `security.test.ts` "F-09" |
 | F-10 | low | Log forging via `client.error` | **Fixed** | `events/route.ts:17` *(code review)* |
 | F-11 | low | `//host` links treated as internal | **Fixed** | `markdown.tsx:13` *(code review)* |
