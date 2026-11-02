@@ -37,7 +37,11 @@ export function detectIntent(text: string): { kind: IntentKind; calls: Array<{ n
     case "opportunities": return { kind, calls: [{ name: "match_opportunities", input: { limit: 5 } }] };
     case "gap": return { kind, calls: [{ name: "analyze_skill_gap", input: {} }] };
     case "plan": return { kind, calls: [{ name: "create_learning_roadmap", input: { days: 30 } }] };
-    case "cv": return { kind, calls: t.length >= 50 && (cvLike || long) ? [{ name: "analyze_cv", input: { cv_text: t.slice(0, 12000) } }] : [] };
+    case "cv": {
+      const fileId = /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/i.exec(t)?.[0];
+      if (fileId) return { kind, calls: [{ name: "analyze_cv", input: { file_id: fileId } }] };
+      return { kind, calls: t.length >= 50 && (cvLike || long) ? [{ name: "analyze_cv", input: { cv_text: t.slice(0, 12000) } }] : [] };
+    }
     case "interview": return { kind, calls: [{ name: "interview_simulation", input: { mode: "questions", count: 5 } }] };
     case "progress": return { kind, calls: [{ name: "analyze_progress", input: {} }] };
     case "compare": return { kind, calls: [{ name: "compare_options", input: {} }] };

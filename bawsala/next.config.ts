@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Native / ML packages run in Node and must not be bundled.
+  serverExternalPackages: ["@huggingface/transformers", "onnxruntime-node", "pg", "unpdf", "mammoth"],
+  poweredByHeader: false,
+  output: "standalone",
   turbopack: {
     rules: {
       "*.css": {

@@ -9,11 +9,14 @@ import { LOCALE_META, type Locale } from "./config";
 export type Plural = { other: string } & Partial<Record<"zero" | "one" | "two" | "few" | "many", string>>;
 export type Leaf = string | Plural;
 
-type Shape<T> = T extends string ? string : T extends { other: string } ? Plural : { [K in keyof T]: Shape<T[K]> };
+type PluralKey = "zero" | "one" | "two" | "few" | "many" | "other";
+/** An object is a plural leaf only if it has `other` and nothing but plural categories. */
+type IsPlural<T> = T extends { other: string } ? (Exclude<keyof T, PluralKey> extends never ? true : false) : false;
+type Shape<T> = T extends string ? string : IsPlural<T> extends true ? Plural : { [K in keyof T]: Shape<T[K]> };
 export type MessagesShape<T> = Shape<T>;
 
 type Join<K, P> = K extends string ? (P extends string ? `${K}.${P}` : never) : never;
-export type Paths<T> = T extends string | Plural ? never : { [K in keyof T & string]: T[K] extends string | Plural ? K : Join<K, Paths<T[K]>> }[keyof T & string];
+export type Paths<T> = T extends string ? never : IsPlural<T> extends true ? never : { [K in keyof T & string]: T[K] extends string ? K : IsPlural<T[K]> extends true ? K : Join<K, Paths<T[K]>> }[keyof T & string];
 
 const pluralCache = new Map<string, Intl.PluralRules>();
 function pluralRules(locale: Locale) {
@@ -37,13 +40,18 @@ export function interpolate(s: string, vars: Record<string, string | number> | u
   });
 }
 
+const PLURAL_KEYS = new Set(["zero", "one", "two", "few", "many", "other"]);
+export function isPluralObject(v: unknown): boolean {
+  return !!v && typeof v === "object" && "other" in (v as object) && Object.keys(v as object).every((k) => PLURAL_KEYS.has(k));
+}
+
 export function resolve(dict: unknown, path: string): Leaf | undefined {
   let cur: unknown = dict;
   for (const part of path.split(".")) {
     if (cur && typeof cur === "object" && part in (cur as Record<string, unknown>)) cur = (cur as Record<string, unknown>)[part];
     else return undefined;
   }
-  return typeof cur === "string" || (cur && typeof cur === "object" && "other" in (cur as object)) ? (cur as Leaf) : undefined;
+  return typeof cur === "string" || isPluralObject(cur) ? (cur as Leaf) : undefined;
 }
 
 export function render(leaf: Leaf | undefined, locale: Locale, vars?: Record<string, string | number>, fallbackKey?: string): string {

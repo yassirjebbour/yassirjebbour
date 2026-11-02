@@ -189,6 +189,12 @@ export async function* runChat(opts: {
     }
   }
 
+  // Only show sources that the answer actually used: the passages rendered by the basic engine
+  // (top 3), or the [n] markers the model wrote.
+  const used = engine === "basic"
+    ? citations.filter((c) => c.n <= 3)
+    : citations.filter((c) => new RegExp(`\\[${c.n}\\]`).test(text));
+  citations.splice(0, citations.length, ...used);
   if (citations.length) yield { type: "citations", citations };
   const followups = status === "complete" ? followupsFor(toolRecords.map((r) => r.name), user.locale) : [];
   if (followups.length) yield { type: "followups", items: followups };

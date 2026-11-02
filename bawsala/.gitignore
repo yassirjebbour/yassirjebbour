@@ -42,3 +42,4 @@ next-env.d.ts
 
 # embedding model weights (fetched by scripts/fetch-embedding-model.ts, never committed)
 /models
+!.env.example
