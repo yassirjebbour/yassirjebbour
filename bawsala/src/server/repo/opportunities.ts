@@ -30,9 +30,10 @@ export async function listOpportunities(opts: { includeUnpublished?: boolean } =
   );
 }
 
-export async function getOpportunity(id: string): Promise<Opportunity> {
+export async function getOpportunity(id: string, opts: { includeUnpublished?: boolean } = {}): Promise<Opportunity> {
   if (!/^[0-9a-f-]{36}$/i.test(id)) throw new ApiError("not_found");
-  const row = await asPublic((tx) => tx.one<Opportunity>(`${SELECT} WHERE o.id = $1 GROUP BY o.id`, [id]));
+  const visible = opts.includeUnpublished ? "true" : "o.status = 'published' AND (o.expires_at IS NULL OR o.expires_at > now()) AND (o.deadline IS NULL OR o.deadline >= current_date)";
+  const row = await asPublic((tx) => tx.one<Opportunity>(`${SELECT} WHERE o.id = $1 AND ${visible} GROUP BY o.id`, [id]));
   if (!row) throw new ApiError("not_found");
   return row;
 }
@@ -71,6 +72,9 @@ export interface OpportunityInput {
 }
 
 export async function upsertOpportunity(actorId: string, input: OpportunityInput, id?: string) {
+  const known = new Set((await asPublic((tx) => tx.query<{ id: string }>(`SELECT id FROM skills`))).map((r) => r.id));
+  const unknown = input.requirements.filter((r) => !known.has(r.skillId)).map((r) => r.skillId);
+  if (unknown.length) throw new ApiError("validation", `unknown_skill: ${unknown.join(",")}`);
   return asSystem(async (tx) => {
     // Opportunities created through the admin are never demo data; demo rows only come from the seed.
     const vals = [input.title, input.organization, input.city, input.remote, input.kind, input.description, input.project_brief, input.apply_url, input.source_name, input.source_url, false, input.status, input.expires_at,

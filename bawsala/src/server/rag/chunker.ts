@@ -37,8 +37,20 @@ export function chunkMarkdown(md: string, opts: { maxChars?: number; title?: str
         flush();
         const sentences = p.split(/(?<=[.!?؟])\s+/);
         for (const s of sentences) {
-          if ((buf + " " + s).length > maxChars) flush();
-          buf += (buf ? " " : "") + s;
+          // A "sentence" longer than the budget (no punctuation) is cut on word boundaries.
+          const pieces: string[] = [];
+          if (s.length > maxChars) {
+            let cur = "";
+            for (const w of s.split(/\s+/)) {
+              if ((cur + " " + w).length > maxChars && cur) { pieces.push(cur); cur = ""; }
+              cur += (cur ? " " : "") + w;
+            }
+            if (cur) pieces.push(cur);
+          } else pieces.push(s);
+          for (const piece of pieces) {
+            if ((buf + " " + piece).length > maxChars) flush();
+            buf += (buf ? " " : "") + piece;
+          }
         }
         flush();
         continue;

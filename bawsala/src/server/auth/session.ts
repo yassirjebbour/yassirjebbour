@@ -5,6 +5,8 @@ import { hashToken, newToken } from "./tokens";
 export const SESSION_COOKIE = "bawsala_session";
 export const SESSION_DAYS = 30;
 const RENEW_WHEN_DAYS_LEFT = 15;
+/** Absolute maximum lifetime: even an active session must sign in again after 90 days. */
+export const SESSION_MAX_DAYS = 90;
 
 export type Role = "student" | "institution_admin" | "platform_admin";
 export interface SessionUser {
@@ -33,21 +35,21 @@ export async function validateSession(token: string | undefined | null): Promise
   const id = hashToken(token);
   return asSystem(async (tx) => {
     const row = await tx.one<{
-      user_id: string; expires_at: Date; email: string; name: string; locale: SessionUser["locale"]; role: Role; institution_id: string | null;
+      user_id: string; expires_at: Date; created_at: Date; email: string; name: string; locale: SessionUser["locale"]; role: Role; institution_id: string | null;
     }>(
-      `SELECT s.user_id, s.expires_at, u.email, u.name, u.locale, u.role, u.institution_id
+      `SELECT s.user_id, s.expires_at, s.created_at, u.email, u.name, u.locale, u.role, u.institution_id
          FROM sessions s JOIN users u ON u.id = s.user_id
         WHERE s.id = $1`,
       [id],
     );
     if (!row) return null;
-    if (row.expires_at.getTime() <= Date.now()) {
+    if (row.expires_at.getTime() <= Date.now() || row.created_at.getTime() < Date.now() - SESSION_MAX_DAYS * 864e5) {
       await tx.query(`DELETE FROM sessions WHERE id = $1`, [id]);
       return null;
     }
     let renewedUntil: Date | null = null;
     if (row.expires_at.getTime() - Date.now() < RENEW_WHEN_DAYS_LEFT * 864e5) {
-      renewedUntil = new Date(Date.now() + SESSION_DAYS * 864e5);
+      renewedUntil = new Date(Math.min(Date.now() + SESSION_DAYS * 864e5, row.created_at.getTime() + SESSION_MAX_DAYS * 864e5));
       await tx.query(`UPDATE sessions SET expires_at = $2, last_seen_at = now() WHERE id = $1`, [id, renewedUntil]);
     }
     await tx.query(`UPDATE users SET last_active_at = now() WHERE id = $1 AND (last_active_at IS NULL OR last_active_at < now() - interval '10 minutes')`, [row.user_id]);

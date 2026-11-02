@@ -10,7 +10,7 @@ export function Markdown({ children }: { children: string }) {
         remarkPlugins={[remarkGfm]}
         components={{
           a: ({ href, children: c }) => {
-            const internal = href?.startsWith("/");
+            const internal = !!href && href.startsWith("/") && !href.startsWith("//") && !href.startsWith("/\\");
             return internal ? <a href={href}>{c}</a> : <a href={href} target="_blank" rel="noopener noreferrer nofollow">{c}</a>;
           },
           img: () => null,

@@ -45,6 +45,7 @@ export async function ingestDocument(tx: Tx, meta: KbMeta, rawBody: string, opts
   if (existing && existing.content_hash === hash && !opts.force) return { id: existing.id, changed: false, chunks: 0 };
 
   const embedder = getEmbedder();
+  if (embedder && embedder.dims !== 384) throw new Error(`kb_chunks.embedding is vector(384); embedder ${embedder.id} produces ${embedder.dims} dims — add a migration before switching provider`);
   const chunks = chunkMarkdown(body, { title: meta.title });
   const vectors = embedder ? await embedder.embed(chunks.map((c) => (c.heading ? c.heading + "\n" : "") + c.content), "passage") : null;
 

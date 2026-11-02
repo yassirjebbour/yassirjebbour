@@ -26,3 +26,7 @@ L'ANAPEC est l'agence publique marocaine chargée de l'intermédiation sur le ma
 ## En arabe
 
 الوكالة الوطنية لإنعاش التشغيل والكفاءات (أنابيك) مؤسسة عمومية مغربية للوساطة في سوق الشغل. يمكن للباحث عن عمل التسجيل في موقعها الرسمي anapec.org أو في وكالة محلية، وإيداع سيرته الذاتية، والاطلاع على عروض الشغل، والاستفسار عن برامج الإدماج والتكوين. الشروط قد تتغير، لذا يجب التحقق منها دائماً في الموقع الرسمي.
+
+## In English
+
+ANAPEC is Morocco's public employment agency. Job seekers register on anapec.org or at a local agency, complete their profile and CV, browse job offers (some abroad), and ask about current integration and training programmes. Conditions change: always check the official site.

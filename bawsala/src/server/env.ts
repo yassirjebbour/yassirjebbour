@@ -15,6 +15,7 @@ const schema = z.object({
   AI_MODEL: z.string().default("claude-opus-5-5"),
   AI_EFFORT: z.enum(["low", "medium", "high", "xhigh", "max"]).default("low"),
   AI_DAILY_MESSAGES_PER_USER: z.coerce.number().int().min(1).default(60),
+  AI_DAILY_BUDGET_USD: z.coerce.number().min(0).default(20),
   AI_FALLBACKS: z
     .string()
     .optional()
@@ -22,16 +23,8 @@ const schema = z.object({
   // Email (optional). Without RESEND_API_KEY, emails are written to the server log in dev.
   RESEND_API_KEY: z.string().optional(),
   EMAIL_FROM: z.string().default("BAWSALA <no-reply@bawsala.ma>"),
-  // Bootstrap: the first account created with this email becomes platform admin.
-  ADMIN_EMAILS: z
-    .string()
-    .optional()
-    .transform((v) =>
-      (v ?? "")
-        .split(",")
-        .map((s) => s.trim().toLowerCase())
-        .filter(Boolean),
-    ),
+  CRON_SECRET: z.string().min(24, "CRON_SECRET must be at least 24 characters").optional(),
+  TRUSTED_PROXY_HOPS: z.coerce.number().int().min(0).max(5).default(1),
 });
 
 export type Env = z.infer<typeof schema>;

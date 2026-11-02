@@ -86,12 +86,12 @@ export function arabiziToArabic(s: string): string {
 export function normalizeForSearch(s: string): string {
   return s
     .toLowerCase()
+    .replace(/[\u0625\u0623\u0622\u0671]/g, "\u0627") // alef variants → bare alef (before NFKD splits the hamza off)
     .normalize("NFKD")
-    .replace(/[̀-ͯ]/g, "") // Latin accents
-    .replace(/[ً-ْـ]/g, "") // Arabic diacritics, tatweel
-    .replace(/[إأآٱ]/g, "ا")
-    .replace(/ى/g, "ي")
-    .replace(/ة(?=\s|$)/g, "ه")
+    .replace(/\p{M}/gu, "") // every combining mark: Latin accents, Arabic harakat, shadda, hamza marks
+    .replace(/\u0640/g, "") // tatweel
+    .replace(/\u0649/g, "\u064A") // alef maqsura → ya
+    .replace(/\u0629(?=\s|$)/g, "\u0647") // final ta marbuta → ha
     .replace(/[^\p{L}\p{N}\s]/gu, " ")
     .replace(/\s+/g, " ")
     .trim();
@@ -110,3 +110,12 @@ export function guessLanguage(s: string): "ar" | "ary" | "fr" | "en" | "zgh" | "
   }
   return "unknown";
 }
+
+/** Function words removed from keyword queries (EN, FR, MSA, Darija in both scripts). Semantic search still sees the full query. */
+export const STOPWORDS = new Set((
+  "a an the and or of to in on at for with by from is are was were be been do does did how what which who whom when where why can could should would i me my we our you your it its this that these those there here about into as if not no yes so than then too very just also more most some any all " +
+  "le la les un une des du de d l et ou au aux en dans sur pour par avec sans est sont etre etait je j me m mon ma mes tu te ton ta tes il elle on nous vous ils elles leur leurs ce cet cette ces qui que quoi quel quelle quels quelles comment pourquoi ou quand est-ce ne pas plus tres faire fait peux puis " +
+  "في من إلى الى على عن مع هل ما ماذا كيف لماذا متى أين اين هذا هذه ذلك التي الذي الذين هو هي أنا انا نحن أنت انت كان يكون أن ان أو او و ثم لا لم لن قد كل بعض " +
+  "واش شنو اشنو كيفاش علاش فين امتى ديال ديالي ديالك ديالو باش حتى غير بزاف شي واحد هاد هادي هادو راه را كاين كاينة عندي عندك " +
+  "wach chno chnou shno achno kifach kifash 3lach fin fen imta dyal dial dyali dyalek dyalo bach hta ghir bzaf chi had hadi hadou rah kayn kayna 3andi 3ndi 3andek ana nta nti l f w o b"
+).split(/\s+/).map((w) => w.trim()).filter(Boolean));

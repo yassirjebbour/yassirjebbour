@@ -69,7 +69,7 @@ class Voyage implements Embedder {
 let cached: Embedder | null | undefined;
 
 export function modelDir() {
-  return path.resolve(process.env.EMBEDDINGS_MODEL_DIR ?? path.join(process.cwd(), "models", "multilingual-e5-small"));
+  return path.resolve(process.env.EMBEDDINGS_MODEL_DIR ?? path.join(/* turbopackIgnore: true */ process.cwd(), "models", "multilingual-e5-small"));
 }
 
 /** Returns the configured embedder, or null when embeddings are disabled/unavailable. */

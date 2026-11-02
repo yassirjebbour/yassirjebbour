@@ -8,6 +8,12 @@ export interface UsageRecord {
   input?: number; output?: number; cacheRead?: number; cacheWrite?: number; ok: boolean; latencyMs?: number; errorCode?: string | null;
 }
 
+/** Estimated model spend across all users since midnight UTC (for the platform-wide daily budget). */
+export async function spentTodayUsd(): Promise<number> {
+  const r = await asSystem((tx) => tx.one<{ c: string }>(`SELECT coalesce(sum(est_cost_usd), 0)::text c FROM ai_usage WHERE created_at >= date_trunc('day', now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC'`));
+  return Number(r?.c ?? 0);
+}
+
 export async function recordUsage(u: UsageRecord) {
   const cost = u.model ? estimateCostUsd(u.model, { input: u.input ?? 0, output: u.output ?? 0, cacheRead: u.cacheRead, cacheWrite: u.cacheWrite }) : 0;
   log.info("ai.usage", { feature: u.feature, engine: u.engine, model: u.model, in: u.input, out: u.output, cr: u.cacheRead, ok: u.ok, ms: u.latencyMs, cost, err: u.errorCode });

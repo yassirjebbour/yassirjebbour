@@ -21,6 +21,7 @@ export const DELETE = route(async () => {
   await asSystem(async (tx) => {
     await tx.query(`UPDATE users SET institution_id = NULL WHERE id = $1`, [user.id]);
     await tx.query(`UPDATE profiles SET share_with_institution = false WHERE user_id = $1`, [user.id]);
+    await tx.query(`UPDATE verification_requests SET status = 'rejected', review_note = 'student left the institution', reviewed_at = now() WHERE user_id = $1 AND status = 'pending'`, [user.id]);
   });
   return json({ ok: true });
 });

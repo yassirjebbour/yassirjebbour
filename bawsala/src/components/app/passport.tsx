@@ -46,6 +46,7 @@ export function PassportView({ skills, suggestions, catalog, verifications, hasI
     try { await api(`/skills/${id}`, { method: "DELETE" }); router.refresh(); } catch (x) { toast(err(x)); }
   }
   async function requestVerify(id: string) {
+    if (!confirm(t("profile.share_d"))) return; // requesting verification turns on sharing with the institution
     try { await api(`/skills/${id}/verify-request`, { body: {} }); toast(t("passport.verify_requested")); router.refresh(); } catch (x) { toast(err(x)); }
   }
 

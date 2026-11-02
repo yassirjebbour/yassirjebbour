@@ -3,8 +3,9 @@ import { promisify } from "node:util";
 
 const scrypt = promisify(_scrypt) as (pw: string, salt: Buffer, keylen: number, opts: object) => Promise<Buffer>;
 
-// scrypt with N=2^15, r=8, p=1 (OWASP-recommended baseline), 64-byte key.
-const N = 1 << 15, r = 8, p = 1, KEYLEN = 64;
+// scrypt N=2^15, r=8, p=3 — one of the OWASP Password Storage Cheat Sheet equivalents of N=2^17,r=8,p=1
+// (same work, 32 MiB instead of 128 MiB per hash, which matters with concurrent sign-ins). 64-byte key.
+const N = 1 << 15, r = 8, p = 3, KEYLEN = 64;
 const MAXMEM = 128 * N * r * 2;
 
 export async function hashPassword(password: string): Promise<string> {
@@ -23,5 +24,11 @@ export async function verifyPassword(password: string, stored: string): Promise<
   return key.length === expected.length && timingSafeEqual(key, expected);
 }
 
+/** True when a stored hash uses older parameters; it is upgraded at the next successful sign-in. */
+export function needsRehash(stored: string) {
+  const [alg, n, rr, pp] = stored.split("$");
+  return alg !== "scrypt" || Number(n) !== N || Number(rr) !== r || Number(pp) !== p;
+}
+
 /** Used to equalise timing when the email does not exist. */
-export const DUMMY_HASH = "scrypt$32768$8$1$AAAAAAAAAAAAAAAAAAAAAA$" + "A".repeat(86);
+export const DUMMY_HASH = "scrypt$32768$8$3$AAAAAAAAAAAAAAAAAAAAAA$" + "A".repeat(86);

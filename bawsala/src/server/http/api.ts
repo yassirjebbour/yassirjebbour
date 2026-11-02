@@ -8,25 +8,47 @@ import { log } from "../log";
 export { ApiError };
 
 export function json(data: unknown, init?: ResponseInit) {
-  return Response.json(data, { ...init, headers: { "Cache-Control": "no-store", ...(init?.headers ?? {}) } });
+  return Response.json(data, { ...init, headers: { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff", ...(init?.headers ?? {}) } });
 }
 
 /** CSRF defence for cookie-authenticated mutations: the Origin must be our own host. */
 export function assertSameOrigin(req: Request) {
   if (["GET", "HEAD", "OPTIONS"].includes(req.method)) return;
   const origin = req.headers.get("origin");
-  const host = req.headers.get("x-forwarded-host") ?? req.headers.get("host");
-  if (!origin || !host) throw new ApiError("forbidden", "Missing origin");
+  if (!origin) throw new ApiError("forbidden", "Missing origin");
   let originHost: string;
   try { originHost = new URL(origin).host; } catch { throw new ApiError("forbidden", "Bad origin"); }
-  if (originHost !== host) throw new ApiError("forbidden", "Cross-origin request rejected");
+  // The allowed host comes from configuration (APP_URL) or the Host header — never from X-Forwarded-Host,
+  // which any non-browser client can set.
+  const allowed = new Set([req.headers.get("host"), (() => { try { return new URL(process.env.APP_URL ?? "").host; } catch { return null; } })()].filter(Boolean));
+  if (!allowed.has(originHost)) throw new ApiError("forbidden", "Cross-origin request rejected");
 }
 
-export async function readJson<S extends z.ZodType>(req: Request, schema: S): Promise<z.infer<S>> {
-  const len = Number(req.headers.get("content-length") ?? 0);
-  if (len > 256 * 1024) throw new ApiError("bad_request", "Body too large");
+/** Reads the request body with a hard byte limit enforced while streaming (Content-Length can be absent or false). */
+export async function readLimited(req: Request, maxBytes: number): Promise<Uint8Array> {
+  const declared = Number(req.headers.get("content-length") ?? 0);
+  if (declared > maxBytes) throw new ApiError("bad_request", "Body too large");
+  if (!req.body) return new Uint8Array();
+  const reader = req.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > maxBytes) { await reader.cancel().catch(() => {}); throw new ApiError("bad_request", "Body too large"); }
+    chunks.push(value);
+  }
+  const out = new Uint8Array(total);
+  let o = 0;
+  for (const c of chunks) { out.set(c, o); o += c.byteLength; }
+  return out;
+}
+
+export async function readJson<S extends z.ZodType>(req: Request, schema: S, maxBytes = 256 * 1024): Promise<z.infer<S>> {
+  const raw = await readLimited(req, maxBytes);
   let body: unknown;
-  try { body = await req.json(); } catch { throw new ApiError("bad_request", "Invalid JSON"); }
+  try { body = JSON.parse(new TextDecoder().decode(raw) || "null"); } catch { throw new ApiError("bad_request", "Invalid JSON"); }
   const parsed = schema.safeParse(body);
   if (!parsed.success) {
     throw new ApiError("validation", "Invalid input", parsed.error.issues.map((i) => ({ path: i.path.join("."), message: i.message })));
@@ -34,8 +56,16 @@ export async function readJson<S extends z.ZodType>(req: Request, schema: S): Pr
   return parsed.data;
 }
 
+/**
+ * Client IP for rate limiting. Only the address appended by OUR reverse proxy is trusted:
+ * with TRUSTED_PROXY_HOPS=1 (default; one proxy such as Vercel/Fly/Render/nginx) that is the last
+ * X-Forwarded-For entry. Entries a client writes itself come earlier in the list and are ignored.
+ */
 export function clientIp(req: Request) {
-  return (req.headers.get("x-forwarded-for")?.split(",")[0] ?? req.headers.get("x-real-ip") ?? "local").trim();
+  const hops = Math.max(0, Number(process.env.TRUSTED_PROXY_HOPS ?? 1));
+  const xff = (req.headers.get("x-forwarded-for") ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+  if (hops > 0 && xff.length >= hops) return xff[xff.length - hops];
+  return "direct";
 }
 
 export async function apiUser(roles?: Role[]): Promise<SessionUser> {

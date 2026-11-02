@@ -103,10 +103,11 @@ export async function* runChat(opts: {
   conversationId: string;
   userText: string;
   signal: AbortSignal;
+  forceBasic?: boolean;
 }): AsyncGenerator<ChatEvent> {
   const { user, conversationId, signal } = opts;
-  const provider = (await isEnabled("ai.llm", user)) ? getProvider() : null;
-  const engine: "llm" | "basic" = provider ? "llm" : "basic";
+  const provider = !opts.forceBasic && (await isEnabled("ai.llm", user)) ? getProvider() : null;
+  let engine: "llm" | "basic" = provider ? "llm" : "basic";
   yield { type: "meta", conversationId, engine };
 
   const toolCtx: ToolContext = { user, locale: user.locale, conversationId, allowLlm: !!provider, signal };
@@ -121,20 +122,24 @@ export async function* runChat(opts: {
     for (const p of passages) if (!citations.some((c) => c.n === p.n && c.title === p.title)) citations.push({ n: p.n, title: p.title, source: p.source, url: p.url, status: p.status, verified_at: p.verified_at });
   };
 
+  const runBasic = async function* (): AsyncGenerator<ChatEvent> {
+    const intent = detectIntent(opts.userText);
+    for (const call of intent.calls) {
+      const tool = TOOL_BY_NAME.get(call.name)!;
+      const id = `basic_${toolRecords.length + 1}`;
+      yield { type: "tool_start", id, name: call.name };
+      const r = await runTool(tool, call.input, { ...toolCtx, allowLlm: false });
+      toolRecords.push({ id, name: call.name, input: call.input, output: r.ok ? r.output : r.error, ok: r.ok, ms: r.ms });
+      collectCitations(call.name, r.output);
+      yield { type: "tool_end", id, name: call.name, ok: r.ok, output: summarizeOutput(call.name, r.ok ? r.output : r.error), ms: r.ms };
+    }
+    text = renderBasic(intent.kind, toolRecords, user.locale, opts.userText);
+    yield { type: "text", delta: text };
+  };
+
   try {
     if (engine === "basic") {
-      const intent = detectIntent(opts.userText);
-      for (const call of intent.calls) {
-        const tool = TOOL_BY_NAME.get(call.name)!;
-        const id = `basic_${toolRecords.length + 1}`;
-        yield { type: "tool_start", id, name: call.name };
-        const r = await runTool(tool, call.input, toolCtx);
-        toolRecords.push({ id, name: call.name, input: call.input, output: r.ok ? r.output : r.error, ok: r.ok, ms: r.ms });
-        collectCitations(call.name, r.output);
-        yield { type: "tool_end", id, name: call.name, ok: r.ok, output: summarizeOutput(call.name, r.ok ? r.output : r.error), ms: r.ms };
-      }
-      text = renderBasic(intent.kind, toolRecords, user.locale, opts.userText);
-      yield { type: "text", delta: text };
+      yield* runBasic();
     } else {
       const conv = await getConversation(user.id, conversationId);
       const history = historyToLlm(conv.messages.slice(0, -1)); // the last stored message is the current user turn
@@ -182,7 +187,13 @@ export async function* runChat(opts: {
     }
   } catch (e) {
     if (signal.aborted || (e instanceof LlmError && e.code === "cancelled")) status = "stopped";
-    else {
+    else if (e instanceof LlmError && ["unavailable", "timeout", "rate_limited", "auth"].includes(e.code) && !text.trim()) {
+      // Provider outage before any output: answer with the deterministic engine instead of failing.
+      log.warn("chat.llm_fallback_basic", { conv: conversationId, code: e.code });
+      engine = "basic";
+      toolRecords.length = 0;
+      try { yield* runBasic(); } catch (e2) { status = "error"; yield { type: "error", code: "internal" }; log.warn("chat.basic_failed", { err: e2 }); }
+    } else {
       log.warn("chat.failed", { conv: conversationId, err: e });
       status = "error";
       yield { type: "error", code: e instanceof LlmError ? e.code : "internal" };

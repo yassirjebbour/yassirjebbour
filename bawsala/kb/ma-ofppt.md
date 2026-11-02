@@ -28,3 +28,7 @@ Les dates d'inscription, les conditions d'accès (niveau scolaire, âge), les fi
 ## بالعربية
 
 مكتب التكوين المهني وإنعاش الشغل (OFPPT) هو أكبر فاعل عمومي في التكوين المهني بالمغرب، ويقدم تكوينات في مستويات التأهيل والتقني والتقني المتخصص في مجالات متعددة كالرقمي والتسيير والصناعة والسياحة. تحقق من مواعيد التسجيل وشروط الولوج في الموقع الرسمي ofppt.ma.
+
+## In English
+
+OFPPT is Morocco's main public vocational training operator. It offers diploma programmes (qualification, technician and specialised-technician levels) and short courses in many trades — digital, management, industry, tourism, construction. It suits young people who want a concrete trade in one to two years, and graduates who want to add a technical skill. Check registration dates, entry requirements and available programmes per city on ofppt.ma; they change every year.

@@ -6,6 +6,7 @@ import { savePlan } from "@/server/repo/plans";
 import { notify } from "@/server/notify";
 import { track } from "@/server/events";
 import type { DraftTask } from "@/server/domain/roadmap";
+import { asUser } from "@/server/db";
 
 /**
  * The only way a "confirm"-class tool takes effect: the student presses Confirm in the UI.
@@ -14,7 +15,11 @@ import type { DraftTask } from "@/server/domain/roadmap";
 export const POST = route<{ params: Promise<{ id: string }> }>(async (req, { params }) => {
   const user = await apiUser();
   const { decision } = await readJson(req, z.object({ decision: z.enum(["confirm", "cancel"]) }));
-  const action = await takePendingAction(user.id, zUuid.parse((await params).id), decision === "confirm" ? "confirmed" : "cancelled");
+  const id = zUuid.parse((await params).id);
+  const peek = await asUser(user.id, (tx) => tx.one<{ kind: string }>(`SELECT kind FROM pending_actions WHERE id = $1 AND status = 'pending'`, [id]));
+  if (!peek) throw new ApiError("not_found", "action_expired_or_done");
+  if (decision === "confirm" && peek.kind !== "create_plan") throw new ApiError("bad_request", "unsupported_action");
+  const action = await takePendingAction(user.id, id, decision === "confirm" ? "confirmed" : "cancelled");
   if (decision === "cancel") return json({ ok: true, status: "cancelled" });
   if (action.kind === "create_plan") {
     const p = action.payload as { opportunityId: string; title: string; days: number; tasks: DraftTask[] };

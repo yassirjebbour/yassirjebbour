@@ -17,7 +17,7 @@
   --ink: #16201D; --ink2: #46504B; --muted: #646C67; --line: #E6E1D3; --line2: #D6D0BF;
   --g: #0F3D36; --g-ink: #0F3D36; --g200: #24564D; --g300: #6B8F7D; --g600: #DCE7E1; --g700: #EDF3EF;
   --gold: #D4AF7C; --gold-d: #9A7744; --gold-dd: #76582C; --gold-l: #EAD7B5; --gold-xl: #F8F0E2;
-  --ok: #2F6F5B; --ok-l: #E3EFE9; --warn: #8A6A3A; --warn-l: #F8F0E2; --err: #A4473A; --err-l: #F6E6E3;
+  --ok: #2F6F5B; --ok-l: #E3EFE9; --warn: #76582C; --warn-l: #F8F0E2; --err: #A4473A; --err-l: #F6E6E3;
   --on-g: #FFFFFF; --scrim: rgba(18,24,22,.36);
   --shadow: 0 1px 2px rgba(22,32,29,.06), 0 1px 1px rgba(22,32,29,.03);
   --shadow2: 0 1px 1px rgba(22,32,29,.04), 0 4px 10px -2px rgba(22,32,29,.06), 0 24px 48px -24px rgba(15,61,54,.22);
@@ -62,6 +62,8 @@ h2 { font-size: 1.25rem; font-weight: 600; }
 h3 { font-size: 1.05rem; font-weight: 600; }
 p { margin: 0; }
 a { color: var(--g-ink); text-underline-offset: 3px; }
+/* Tailwind preflight removes underlines; links inside text must not rely on colour alone (WCAG 1.4.1). */
+a:not([class]) { text-decoration: underline; }
 a:hover { text-decoration-thickness: 2px; }
 img, svg { max-width: 100%; }
 :focus-visible { outline: 2px solid var(--g); outline-offset: 2px; border-radius: 6px; }

@@ -12,7 +12,8 @@ export async function GET() {
     checks.database = { ok: true, ms: Date.now() - t0, skills: r?.n, migration: r?.m };
   } catch (e) {
     ok = false;
-    checks.database = { ok: false, error: (e as Error).message.slice(0, 120) };
+    checks.database = { ok: false };
+    console.error(JSON.stringify({ level: "error", event: "health.db_failed", err: (e as Error).message }));
   }
   checks.llm = { configured: !!getProvider() };
   checks.embeddings = { configured: !!getEmbedder(), model: getEmbedder()?.id ?? null };

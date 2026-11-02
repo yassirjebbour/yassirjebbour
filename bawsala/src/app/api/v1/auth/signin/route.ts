@@ -4,7 +4,7 @@ import { route, readJson, json, clientIp, ApiError } from "@/server/http/api";
 import { zEmail } from "@/server/http/schemas";
 import { checkCredentials } from "@/server/repo/account";
 import { createSession, SESSION_COOKIE, sessionCookieOptions } from "@/server/auth/session";
-import { rateLimit, pruneRateLimits } from "@/server/ratelimit";
+import { rateLimit, rateLimitPeek, pruneRateLimits } from "@/server/ratelimit";
 import { asSystem } from "@/server/db";
 import { track } from "@/server/events";
 import { LOCALE_COOKIE } from "@/i18n/config";
@@ -14,11 +14,15 @@ const Body = z.object({ email: zEmail, password: z.string().min(1).max(200) });
 export const POST = route(async (req) => {
   const ip = clientIp(req);
   const body = await readJson(req, Body);
-  // Two limits: per IP (credential stuffing) and per account (targeted guessing).
+  // Two limits: per IP (credential stuffing) and per account (targeted guessing). The per-account
+  // limit counts only FAILED attempts, so successful sign-ins never lock the owner out.
   await rateLimit(`signin:ip:${ip}`, 20, 900);
-  await rateLimit(`signin:email:${body.email}`, 8, 900);
+  await rateLimitPeek(`signin:fail:${body.email}`, 8, 900);
   const userId = await checkCredentials(body.email, body.password);
-  if (!userId) throw new ApiError("unauthorized", "invalid_credentials");
+  if (!userId) {
+    await rateLimit(`signin:fail:${body.email}`, 1_000_000, 900);
+    throw new ApiError("unauthorized", "invalid_credentials");
+  }
   const { token, expires } = await createSession(userId, { userAgent: req.headers.get("user-agent"), ip });
   const store = await cookies();
   store.set(SESSION_COOKIE, token, sessionCookieOptions(expires));

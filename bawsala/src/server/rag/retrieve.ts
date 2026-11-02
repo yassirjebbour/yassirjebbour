@@ -12,7 +12,7 @@
 import { createHash } from "node:crypto";
 import { asPublic, asSystem } from "../db";
 import { getEmbedder, toPgVector } from "./embedder";
-import { arabiziToArabic, looksArabizi, normalizeForSearch, guessLanguage } from "./text";
+import { arabiziToArabic, looksArabizi, normalizeForSearch, guessLanguage, STOPWORDS } from "./text";
 import { log } from "../log";
 
 export interface RetrievedChunk {
@@ -20,18 +20,27 @@ export interface RetrievedChunk {
   vectorRank: number | null; keywordRank: number | null;
   doc: { slug: string; title: string; kind: string; language: string; sourceName: string; sourceUrl: string | null; verificationStatus: string; verifiedAt: string | null; publishedAt: string | null; version: number };
 }
-export interface RetrievalResult { mode: "hybrid" | "keyword"; results: RetrievedChunk[]; variants: string[]; latencyMs: number; embedder: string | null }
+export interface RetrievalResult { mode: "hybrid" | "keyword" | "vector"; results: RetrievedChunk[]; variants: string[]; latencyMs: number; embedder: string | null }
 
 const RRF_K = 60;
+/** Channel weights for Reciprocal Rank Fusion. Chosen by the retrieval evaluation (docs/AI_EVALUATION_REPORT.md):
+ *  semantic ranking is the primary signal; keyword search adds exact names (ANAPEC, Excel) and Arabizi recall. */
+export const RRF_WEIGHTS = { vector: 1, keyword: 1 };
 
-export async function retrieve(query: string, opts: { k?: number; kinds?: string[]; userId?: string | null; log?: boolean } = {}): Promise<RetrievalResult> {
+export type RetrievalMode = "hybrid" | "vector" | "keyword";
+
+export async function retrieve(query: string, opts: { k?: number; kinds?: string[]; userId?: string | null; log?: boolean; mode?: RetrievalMode; weights?: { vector: number; keyword: number }; stopwords?: boolean } = {}): Promise<RetrievalResult> {
   const t0 = Date.now();
   const k = Math.min(opts.k ?? 6, 20);
   const q = query.trim().slice(0, 500);
   const variants = [q];
   if (looksArabizi(q)) variants.push(arabiziToArabic(q));
   const kinds = opts.kinds?.length ? opts.kinds : null;
-  const embedder = getEmbedder();
+  const wantVector = opts.mode !== "keyword";
+  const wantKeyword = opts.mode !== "vector";
+  const embedder = wantVector ? getEmbedder() : null;
+  const weights = opts.weights ?? RRF_WEIGHTS;
+  const useStop = opts.stopwords !== false;
 
   const ranks = new Map<string, { v: number | null; kw: number | null }>();
   const touch = (id: string) => { if (!ranks.has(id)) ranks.set(id, { v: null, kw: null }); return ranks.get(id)!; };
@@ -49,10 +58,10 @@ export async function retrieve(query: string, opts: { k?: number; kinds?: string
         rows.forEach((r, i) => { const e = touch(r.id); e.v = e.v === null ? i + 1 : Math.min(e.v, i + 1); });
       }
     }
-    for (const variant of variants) {
+    for (const variant of wantKeyword ? variants : []) {
       const norm = normalizeForSearch(variant);
       if (!norm) continue;
-      const terms = norm.split(" ").filter((w) => w.length > 1).slice(0, 12);
+      const terms = norm.split(" ").filter((w) => w.length > 1 && (!useStop || !STOPWORDS.has(w))).slice(0, 12);
       if (!terms.length) continue;
       const rows = await tx.query<{ id: string }>(
         `SELECT c.id, ts_rank(c.tsv, to_tsquery('simple', $1)) + similarity(c.search_text, $2) AS s
@@ -60,13 +69,13 @@ export async function retrieve(query: string, opts: { k?: number; kinds?: string
           WHERE d.status = 'active' AND ($3::text[] IS NULL OR d.kind = ANY($3))
             AND (c.tsv @@ to_tsquery('simple', $1) OR c.search_text % $2)
           ORDER BY s DESC LIMIT 20`,
-        [terms.map((t) => t.replace(/[':&|!()<>*\\]/g, "") + ":*").filter((t) => t.length > 2).join(" | ") || "zzzz", norm, kinds],
+        [terms.map((t) => t.replace(/[':&|!()<>*\\]/g, "") + ":*").filter((t) => t.length > 2).join(" | ") || "zzzz", terms.join(" ") || norm, kinds],
       );
       rows.forEach((r, i) => { const e = touch(r.id); e.kw = e.kw === null ? i + 1 : Math.min(e.kw, i + 1); });
     }
   });
 
-  const scored = [...ranks.entries()].map(([id, r]) => ({ id, v: r.v, kw: r.kw, score: (r.v ? 1 / (RRF_K + r.v) : 0) + (r.kw ? 1 / (RRF_K + r.kw) : 0) }));
+  const scored = [...ranks.entries()].map(([id, r]) => ({ id, v: r.v, kw: r.kw, score: (r.v ? weights.vector / (RRF_K + r.v) : 0) + (r.kw ? weights.keyword / (RRF_K + r.kw) : 0) }));
   scored.sort((a, b) => b.score - a.score);
   const top = scored.slice(0, k);
   let results: RetrievedChunk[] = [];
@@ -92,7 +101,7 @@ export async function retrieve(query: string, opts: { k?: number; kinds?: string
     results.sort((a, b) => b.score - a.score);
   }
   const latencyMs = Date.now() - t0;
-  const out: RetrievalResult = { mode: embedder ? "hybrid" : "keyword", results, variants, latencyMs, embedder: embedder?.id ?? null };
+  const out: RetrievalResult = { mode: embedder && wantKeyword ? "hybrid" : embedder ? "vector" : "keyword", results, variants, latencyMs, embedder: embedder?.id ?? null };
   if (opts.log !== false) {
     const qh = createHash("sha256").update(q).digest("hex").slice(0, 16);
     asSystem((tx) => tx.query(`INSERT INTO retrieval_log (user_id, query_hash, query_lang, mode, results, latency_ms) VALUES ($1,$2,$3,$4,$5,$6)`, [

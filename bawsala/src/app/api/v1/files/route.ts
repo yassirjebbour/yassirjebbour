@@ -1,4 +1,4 @@
-import { route, json, apiUser, ApiError } from "@/server/http/api";
+import { route, json, apiUser, ApiError, readLimited } from "@/server/http/api";
 import { listFiles, saveUpload, MAX_FILE_BYTES } from "@/server/repo/files";
 import { rateLimit } from "@/server/ratelimit";
 import { isEnabled } from "@/server/flags";
@@ -13,9 +13,9 @@ export const POST = route(async (req) => {
   const user = await apiUser();
   if (!(await isEnabled("uploads.cv", user))) throw new ApiError("forbidden", "uploads_disabled");
   await rateLimit(`upload:${user.id}`, 20, 3600);
-  const len = Number(req.headers.get("content-length") ?? 0);
-  if (len > MAX_FILE_BYTES + 64 * 1024) throw new ApiError("validation", "file_size");
-  const form = await req.formData();
+  // Enforce the byte limit while streaming (chunked requests carry no Content-Length).
+  const raw = await readLimited(req, MAX_FILE_BYTES + 64 * 1024).catch(() => { throw new ApiError("validation", "file_size"); });
+  const form = await new Response(Buffer.from(raw), { headers: { "content-type": req.headers.get("content-type") ?? "" } }).formData();
   const file = form.get("file");
   const purpose = form.get("purpose") === "evidence" ? "evidence" : "cv";
   if (!(file instanceof File)) throw new ApiError("validation", "file_missing");

@@ -44,8 +44,11 @@ export async function verificationQueue(institutionId: string) {
 export async function reviewVerification(reviewer: { id: string; institutionId: string }, requestId: string, decision: "approved" | "rejected", note: string | null) {
   return asSystem(async (tx) => {
     const vr = await tx.one<{ user_skill_id: string; user_id: string }>(
-      `UPDATE verification_requests SET status = $3, reviewer_id = $4, review_note = $5, reviewed_at = now()
-        WHERE id = $1 AND institution_id = $2 AND status = 'pending' RETURNING user_skill_id, user_id`,
+      `UPDATE verification_requests vr SET status = $3, reviewer_id = $4, review_note = $5, reviewed_at = now()
+         FROM users u JOIN profiles p ON p.user_id = u.id
+        WHERE vr.id = $1 AND vr.institution_id = $2 AND vr.status = 'pending'
+          AND u.id = vr.user_id AND u.institution_id = $2 AND p.share_with_institution
+        RETURNING vr.user_skill_id, vr.user_id`,
       [requestId, reviewer.institutionId, decision, reviewer.id, note]);
     if (!vr) throw new ApiError("not_found");
     if (decision === "approved") await tx.query(`UPDATE user_skills SET status = 'verified' WHERE id = $1`, [vr.user_skill_id]);

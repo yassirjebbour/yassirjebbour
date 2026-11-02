@@ -65,7 +65,7 @@ async function run<T>(settings: Record<string, string>, fn: (tx: Tx) => Promise<
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export function asUser<T>(userId: string, fn: (tx: Tx) => Promise<T>): Promise<T> {
+export async function asUser<T>(userId: string, fn: (tx: Tx) => Promise<T>): Promise<T> {
   if (!UUID.test(userId)) throw new Error("asUser: invalid user id");
   return run({ "app.user_id": userId, "app.role": "user" }, fn);
 }

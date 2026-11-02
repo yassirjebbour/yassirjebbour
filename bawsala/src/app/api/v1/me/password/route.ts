@@ -1,5 +1,8 @@
 import { z } from "zod";
+import { cookies } from "next/headers";
 import { route, readJson, json, apiUser } from "@/server/http/api";
+import { SESSION_COOKIE } from "@/server/auth/session";
+import { hashToken } from "@/server/auth/tokens";
 import { zPassword } from "@/server/http/schemas";
 import { changePassword } from "@/server/repo/account";
 import { rateLimit } from "@/server/ratelimit";
@@ -11,7 +14,8 @@ export const POST = route(async (req) => {
   const user = await apiUser();
   await rateLimit(`pwchange:${user.id}`, 5, 3600);
   const body = await readJson(req, Body);
-  await changePassword(user.id, body.current, body.next);
+  const token = (await cookies()).get(SESSION_COOKIE)?.value;
+  await changePassword(user.id, body.current, body.next, token ? hashToken(token) : undefined);
   await notify(user.id, "security", { what: "password" });
   await enqueueEmail({ userId: user.id, to: user.email, template: "password_changed", locale: user.locale, data: { name: user.name, link: `${env().APP_URL}/forgot` } });
   return json({ ok: true });

@@ -2,7 +2,8 @@ import { z } from "zod";
 import { route, readJson, apiUser, ApiError } from "@/server/http/api";
 import { zUuid } from "@/server/http/schemas";
 import { runChat } from "@/server/ai/chat";
-import { addMessage, createConversation, getConversation, messagesToday, popLastAssistant } from "@/server/repo/conversations";
+import { addMessage, createConversation, getConversation, popLastAssistant } from "@/server/repo/conversations";
+import { spentTodayUsd } from "@/server/ai/usage";
 import { rateLimit } from "@/server/ratelimit";
 import { isEnabled } from "@/server/flags";
 import { env } from "@/server/env";
@@ -25,7 +26,11 @@ export const POST = route(async (req) => {
   const user = await apiUser();
   if (!(await isEnabled("ai.assistant", user))) throw new ApiError("ai_unavailable", "assistant_disabled");
   await rateLimit(`chat:min:${user.id}`, 12, 60);
-  if ((await messagesToday(user.id)) >= env().AI_DAILY_MESSAGES_PER_USER) throw new ApiError("ai_quota", "daily_limit");
+  // Every generation counts (including regenerate); the counter is independent of conversations,
+  // so deleting a conversation does not reset it.
+  await rateLimit(`chat:day:${user.id}`, env().AI_DAILY_MESSAGES_PER_USER, 86_400).catch((e) => { throw e instanceof ApiError ? new ApiError("ai_quota", "daily_limit", undefined, e.retryAfter) : e; });
+  // Platform-wide daily budget: above it the assistant keeps working in basic mode (no model cost).
+  const overBudget = (await spentTodayUsd()) >= env().AI_DAILY_BUDGET_USD;
   const body = await readJson(req, Body);
 
   let conversationId = body.conversationId ?? null;
@@ -47,7 +52,7 @@ export const POST = route(async (req) => {
     async start(controller) {
       const send = (ev: unknown) => { try { controller.enqueue(encoder.encode(`data: ${JSON.stringify(ev)}\n\n`)); } catch { /* client gone */ } };
       try {
-        for await (const ev of runChat({ user, conversationId: conversationId!, userText: text, signal })) {
+        for await (const ev of runChat({ user, conversationId: conversationId!, userText: text, signal, forceBasic: overBudget })) {
           send(ev);
           if (ev.type === "tool_end") track(user.id, "tool.executed", { tool: ev.name, ok: ev.ok });
         }

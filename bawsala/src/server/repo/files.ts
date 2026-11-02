@@ -36,6 +36,26 @@ async function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
   return Promise.race([p, new Promise<T>((_, rej) => { t = setTimeout(() => rej(new Error("extraction timeout")), ms); })]).finally(() => clearTimeout(t));
 }
 
+/** Reads the ZIP central directory and rejects archives that would expand too much (zip bombs). */
+export function zipLooksSafe(buf: Buffer, maxTotal = 30 * 1024 * 1024, maxRatio = 120): boolean {
+  const eocd = buf.lastIndexOf(Buffer.from([0x50, 0x4b, 0x05, 0x06]));
+  if (eocd < 0 || eocd + 22 > buf.length) return false;
+  const entries = buf.readUInt16LE(eocd + 10);
+  let off = buf.readUInt32LE(eocd + 16);
+  if (entries > 2000) return false;
+  let total = 0;
+  for (let i = 0; i < entries; i++) {
+    if (off + 46 > buf.length || buf.readUInt32LE(off) !== 0x02014b50) return false;
+    const comp = buf.readUInt32LE(off + 20);
+    const uncomp = buf.readUInt32LE(off + 24);
+    if (uncomp === 0xffffffff || comp === 0xffffffff) return false; // ZIP64: not expected in a CV
+    total += uncomp;
+    if (total > maxTotal || (comp > 0 && uncomp / comp > maxRatio && uncomp > 1024 * 1024)) return false;
+    off += 46 + buf.readUInt16LE(off + 28) + buf.readUInt16LE(off + 30) + buf.readUInt16LE(off + 32);
+  }
+  return true;
+}
+
 export async function extractText(buf: Buffer, mime: string): Promise<string> {
   if (mime === TXT) return buf.toString("utf8");
   if (mime === PDF) {
@@ -45,6 +65,7 @@ export async function extractText(buf: Buffer, mime: string): Promise<string> {
     return Array.isArray(text) ? text.join("\n") : text;
   }
   if (mime === DOCX) {
+    if (!zipLooksSafe(buf)) throw new Error("archive expansion limits exceeded");
     const mammoth = await import("mammoth");
     const r = await withTimeout(mammoth.extractRawText({ buffer: buf }), 15_000);
     return r.value;

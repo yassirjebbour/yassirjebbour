@@ -232,8 +232,8 @@ export const interviewSimulation = defineTool({
 
 export const applicationAssistant = defineTool({
   name: "application_assistant",
-  description: "Prepare an application for one opportunity: maps each requirement to the student's own evidence (quotes, links), lists what is missing, returns a checklist, and the facts the model may use to draft a cover letter or message. Never invent experience: use only the evidence returned here. Marks the opportunity as 'preparing' in the student's saved list (reversible).",
-  permission: "reversible",
+  description: "Prepare an application for one opportunity: maps each requirement to the student's own evidence (quotes, links), lists what is missing, returns a checklist, and the facts the model may use to draft a cover letter or message. Never invent experience: use only the evidence returned here. Read-only.",
+  permission: "read",
   input: z.object({ opportunity_id: uuid, language: z.enum(["fr", "en", "ar"]).default("fr") }),
   output: z.object({
     opportunity: OppOut,
@@ -251,7 +251,6 @@ export const applicationAssistant = defineTool({
       evidence: byId.get(r.skillId)!.evidence.map((e) => [e.text, e.url].filter(Boolean).join(" — ")).filter(Boolean).slice(0, 3),
     }));
     const missing = opp.requirements.filter((r) => r.required && !byId.has(r.skillId)).map((r) => skillName(r.skillId, ctx.locale));
-    await saveOpportunity(ctx.user.id, opp.id, "preparing");
     return {
       opportunity: oppSummary(opp, ctx.locale), matched_evidence: matched, missing,
       checklist: ["cv_one_page_in_offer_language", "one_number_per_experience", "cover_letter_names_two_requirements_with_evidence", "passport_link_or_portfolio", "check_deadline_and_source", ...(opp.is_sample ? ["demo_data_do_not_apply"] : [])],

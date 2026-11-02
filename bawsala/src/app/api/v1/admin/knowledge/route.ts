@@ -25,7 +25,7 @@ const Body = z.object({
 
 export const POST = route(async (req) => {
   const admin = await apiUser(["platform_admin"]);
-  const { body, ...meta } = await readJson(req, Body);
+  const { body, ...meta } = await readJson(req, Body, 1024 * 1024); // 200k characters of Arabic/Tifinagh can exceed 256 KiB
   const r = await asSystem(async (tx) => {
     const res = await ingestDocument(tx, meta, body, { actorId: admin.id });
     await tx.query(`INSERT INTO audit_log (actor_id, action, target, meta) VALUES ($1,'kb.ingested',$2,$3)`, [admin.id, meta.slug, JSON.stringify({ changed: res.changed, chunks: res.chunks })]);

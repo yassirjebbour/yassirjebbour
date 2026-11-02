@@ -130,7 +130,7 @@ export function Onboarding({ initial }: { initial: Init }) {
           <Field id="exp-desc" label={t("onboarding.s3_desc")} hint={words < 15 ? t("onboarding.s3_meter_low") : t("onboarding.s3_meter_ok")}>
             <textarea id="exp-desc" className="textarea" style={{ minHeight: 160 }} value={exp.description} placeholder={t("onboarding.s3_desc_ph")} onChange={(e) => setExp({ ...exp, description: e.target.value })} maxLength={4000} />
           </Field>
-          <Meter value={Math.min(words, 40)} max={40} label={t("onboarding.s3_desc")} tone="gold" />
+          <Meter value={Math.min(words, 40)} max={40} label={words < 15 ? t("onboarding.s3_meter_low") : t("onboarding.s3_meter_ok")} tone="gold" />
           {error ? <p className="alert alert-err" role="alert">{error}</p> : null}
           <div className="row">
             <Button onClick={analyze} loading={busy} disabled={exp.description.trim().length < 10}>{t("onboarding.s3_analyze")}</Button>
