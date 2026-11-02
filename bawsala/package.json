@@ -6,10 +6,22 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:seed": "node --conditions=react-server --import tsx scripts/seed.ts",
+    "kb:ingest": "node --conditions=react-server --import tsx scripts/kb-ingest.ts",
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:e2e": "playwright test",
+    "eval:ai": "node --conditions=react-server --import tsx scripts/ai-eval.ts",
+    "setup": "npm run db:migrate && npm run db:seed && npm run kb:ingest"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0",
+    "@huggingface/transformers": "^4.3.2",
+    "mammoth": "^1.13.0",
     "next": "16.4.3",
     "pg": "^8.23.1",
     "react": "19.3.0",
@@ -17,6 +29,7 @@
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "server-only": "^0.0.1",
+    "unpdf": "^1.9.1",
     "zod": "^4.6.7"
   },
   "devDependencies": {

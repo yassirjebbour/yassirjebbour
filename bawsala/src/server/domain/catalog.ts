@@ -1,7 +1,7 @@
 /* Generated from the BAWSALA v2 prototype data (scripts in PROJECT_STATUS.md) and then curated.
  * Content languages: en / fr / ar. Darija falls back to Arabic, Tamazight to French for
  * professional content until a native reviewer signs off (see docs/I18N.md). */
-import type { Localized } from "@/i18n/config";
+import type { Localized } from "../../i18n/config";
 
 export interface SkillDef { id: string; category: string; names: Localized; learn: { title: Localized; hours: number | null; url: string | null } | null }
 export interface SampleOpportunity { slug: string; organization: string; city: string; kind: "job" | "internship"; title: Localized; required: string[]; nice: string[]; project?: Localized }
@@ -824,7 +824,7 @@ export const SAMPLE_OPPORTUNITIES: SampleOpportunity[] = [
 ];
 
 /** Practice and proof steps per skill, used to build 30-day paths. */
-export const DRILLS: Record<string, { practice: Localized; prove: Localized }> = {
+export const DRILLS: Record<string, { practice: Localized; prove: Localized; days?: Array<Localized | null> }> = {
  "crm": {
   "practice": {
    "en": "Log 10 real prospects in HubSpot with their stage",

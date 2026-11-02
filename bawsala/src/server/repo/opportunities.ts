@@ -9,12 +9,14 @@ export interface Opportunity {
   id: string; slug: string | null; title: Localized; organization: string; city: string | null; remote: boolean;
   kind: string; description: Localized; project_brief: Localized | null; apply_url: string | null;
   source_name: string; source_url: string | null; is_sample: boolean; status: string;
-  source_updated_at: Date; expires_at: Date | null; requirements: Requirement[];
+  verification_status: "verified" | "unverified" | "demo"; last_verified_at: Date | null; deadline: string | null; published_at: string | null;
+  eligibility: Localized | null; source_updated_at: Date; expires_at: Date | null; requirements: Requirement[];
 }
 
 const SELECT = `
   SELECT o.id, o.slug, o.title, o.organization, o.city, o.remote, o.kind, o.description, o.project_brief, o.apply_url,
          o.source_name, o.source_url, o.is_sample, o.status, o.source_updated_at, o.expires_at,
+         o.verification_status, o.last_verified_at, to_char(o.deadline,'YYYY-MM-DD') deadline, to_char(o.published_at,'YYYY-MM-DD') published_at, o.eligibility,
          coalesce(json_agg(json_build_object('skillId', os.skill_id, 'required', os.required) ORDER BY os.required DESC, os.skill_id)
                   FILTER (WHERE os.skill_id IS NOT NULL), '[]') AS requirements
     FROM opportunities o LEFT JOIN opportunity_skills os ON os.opportunity_id = o.id`;
@@ -22,7 +24,7 @@ const SELECT = `
 export async function listOpportunities(opts: { includeUnpublished?: boolean } = {}): Promise<Opportunity[]> {
   return asPublic((tx) =>
     tx.query<Opportunity>(
-      `${SELECT} WHERE ${opts.includeUnpublished ? "true" : "o.status = 'published' AND (o.expires_at IS NULL OR o.expires_at > now())"}
+      `${SELECT} WHERE ${opts.includeUnpublished ? "true" : "o.status = 'published' AND (o.expires_at IS NULL OR o.expires_at > now()) AND (o.deadline IS NULL OR o.deadline >= current_date)"}
        GROUP BY o.id ORDER BY o.is_sample, o.source_updated_at DESC`,
     ),
   );
@@ -63,26 +65,31 @@ export async function unsaveOpportunity(userId: string, opportunityId: string) {
 export interface OpportunityInput {
   title: Localized; organization: string; city: string | null; remote: boolean; kind: string;
   description: Localized; project_brief: Localized | null; apply_url: string | null;
-  source_name: string; source_url: string | null; is_sample: boolean; status: string; expires_at: string | null;
+  source_name: string; source_url: string | null; status: string; expires_at: string | null;
+  verification_status: "verified" | "unverified"; deadline: string | null; published_at: string | null; eligibility: Localized | null;
   requirements: Requirement[];
 }
 
 export async function upsertOpportunity(actorId: string, input: OpportunityInput, id?: string) {
   return asSystem(async (tx) => {
-    const vals = [input.title, input.organization, input.city, input.remote, input.kind, input.description, input.project_brief, input.apply_url, input.source_name, input.source_url, input.is_sample, input.status, input.expires_at];
+    // Opportunities created through the admin are never demo data; demo rows only come from the seed.
+    const vals = [input.title, input.organization, input.city, input.remote, input.kind, input.description, input.project_brief, input.apply_url, input.source_name, input.source_url, false, input.status, input.expires_at,
+      input.verification_status, input.deadline, input.published_at, input.eligibility];
     let oid = id;
     if (id) {
       const r = await tx.one<{ id: string }>(
         `UPDATE opportunities SET title=$2, organization=$3, city=$4, remote=$5, kind=$6, description=$7, project_brief=$8, apply_url=$9,
-                source_name=$10, source_url=$11, is_sample=$12, status=$13, expires_at=$14, source_updated_at = now() WHERE id = $1 RETURNING id`,
+                source_name=$10, source_url=$11, is_sample=$12, status=$13, expires_at=$14, verification_status=$15, deadline=$16, published_at=$17, eligibility=$18,
+                last_verified_at = CASE WHEN $15 = 'verified' THEN now() ELSE last_verified_at END, source_updated_at = now() WHERE id = $1 RETURNING id`,
         [id, ...vals],
       );
       if (!r) throw new ApiError("not_found");
       await tx.query(`DELETE FROM opportunity_skills WHERE opportunity_id = $1`, [id]);
     } else {
       const r = await tx.one<{ id: string }>(
-        `INSERT INTO opportunities (title, organization, city, remote, kind, description, project_brief, apply_url, source_name, source_url, is_sample, status, expires_at, created_by)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING id`,
+        `INSERT INTO opportunities (title, organization, city, remote, kind, description, project_brief, apply_url, source_name, source_url, is_sample, status, expires_at,
+                                    verification_status, deadline, published_at, eligibility, last_verified_at, created_by)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17, CASE WHEN $14 = 'verified' THEN now() END, $18) RETURNING id`,
         [...vals, actorId],
       );
       oid = r!.id;

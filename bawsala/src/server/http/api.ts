@@ -58,6 +58,9 @@ export function route<C = unknown>(fn: Handler<C>): Handler<C> {
       assertSameOrigin(req);
       return await fn(req, ctx);
     } catch (e) {
+      if (e instanceof z.ZodError) {
+        return json({ error: { code: "validation", message: "Invalid input", details: e.issues.map((i) => ({ path: i.path.join("."), message: i.message })) } }, { status: 422 });
+      }
       if (e instanceof ApiError) {
         return json(
           { error: { code: e.code, message: e.message, details: e.details } },
