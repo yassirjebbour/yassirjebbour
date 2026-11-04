@@ -50,7 +50,8 @@ export function Chat({ conversations, conversation, messages, userName, engine, 
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const sentInitial = useRef(false);
 
-  useEffect(() => { scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight }); }, [msgs]);
+  // Follow the conversation; the empty state (welcome + prompts) is read from the top.
+  useEffect(() => { if (msgs.length) scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight }); }, [msgs]);
   useEffect(() => {
     if (initialMessage && !sentInitial.current) { sentInitial.current = true; send(initialMessage); }
     // eslint-disable-next-line react-hooks/exhaustive-deps
