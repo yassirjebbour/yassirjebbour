@@ -57,7 +57,7 @@ export function CommandPalette() {
     { id: "add-exp", group: "actions", label: t("shell.add_experience"), icon: IconPlus, run: go("/app/profile#experiences") },
     { id: "new-chat", group: "actions", label: t("shell.new_chat"), icon: IconSpark, run: go("/app/assistant") },
     { id: "print", group: "actions", label: t("shell.print_passport"), icon: IconFile, run: go("/app/passport/print") },
-    { id: "export", group: "actions", label: t("shell.export"), icon: IconFile, run: () => { setOpen(false); window.location.assign("/api/v1/me/export"); } },
+    { id: "export", group: "actions", label: t("shell.export"), icon: IconFile, run: () => { setOpen(false); const a = document.createElement("a"); a.href = "/api/v1/me/export"; a.download = ""; a.click(); } },
     { id: "theme", group: "actions", label: t("shell.theme"), icon: IconSettings, run: () => { toggleTheme(); setOpen(false); } },
     ...LOCALES.filter((l) => l !== locale).map((l: Locale): Cmd => ({
       id: `lang-${l}`, group: "actions", label: t("shell.language", { name: LOCALE_META[l].label }), icon: IconGlobe, keywords: l,
