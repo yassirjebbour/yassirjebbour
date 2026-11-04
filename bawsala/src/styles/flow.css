@@ -299,7 +299,7 @@ a.cite-title:hover { text-decoration: underline; }
 .dt code { font-size: 12.5px; background: var(--sunk); padding: 1px 6px; border-radius: 6px; }
 .signals { display: grid; gap: var(--s3); grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); }
 .signal { display: flex; gap: var(--s3); align-items: flex-start; padding: var(--s4); border-radius: var(--r2); background: var(--surface2); border: 1px solid var(--line); min-width: 0; }
-.signal-v { overflow-wrap: anywhere; }
+.signal-v { overflow-wrap: break-word; word-break: normal; }
 .signal-fb { display: inline-flex; gap: var(--s4); }
 .signal-fb > span { display: inline-flex; align-items: center; gap: 4px; }
 
