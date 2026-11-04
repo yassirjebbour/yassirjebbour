@@ -1,5 +1,10 @@
 import type { Messages } from "./index";
 
+import { shell } from "./ext/shell";
+import { home } from "./ext/home";
+import { screens } from "./ext/screens";
+import { flow } from "./ext/flow";
+
 export const fr: Messages = {
   meta: {
     title: "BAWSALA — Découvrez ce que vous savez faire",
@@ -675,4 +680,8 @@ export const fr: Messages = {
     zgh: "Tamazight",
     ary: "Darija",
   },
+  shell: shell.fr,
+  home: home.fr,
+  screens: screens.fr,
+  flow: flow.fr,
 };

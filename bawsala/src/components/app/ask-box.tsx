@@ -10,15 +10,17 @@ export function AskBox() {
   const router = useRouter();
   const [q, setQ] = useState("");
   return (
-    <form className="stack-sm" style={{ marginTop: 12 }} onSubmit={(e) => { e.preventDefault(); if (q.trim()) router.push(`/app/assistant?q=${encodeURIComponent(q.trim())}`); }}>
+    <form className="ask-box" onSubmit={(e) => { e.preventDefault(); if (q.trim()) router.push(`/app/assistant?q=${encodeURIComponent(q.trim())}`); }}>
       <label htmlFor="ask" className="sr-only">{t("dashboard.assistant_title")}</label>
-      <div className="row" style={{ flexWrap: "nowrap" }}>
-        <input id="ask" className="input" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("dashboard.assistant_ph")} maxLength={500} />
-        <button className="btn btn-primary btn-icon" aria-label={t("assistant.send")}><IconSend width={18} height={18} /></button>
+      <div className="ask-field">
+        <input id="ask" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("dashboard.assistant_ph")} maxLength={500} autoComplete="off" />
+        <button className="btn btn-primary btn-icon" aria-label={t("assistant.send")} disabled={!q.trim()}><IconSend width={18} height={18} className="flip-rtl" /></button>
       </div>
-      <div className="chips">
-        {(["skills", "match", "plan"] as const).map((k) => (
-          <button key={k} type="button" className="chip" onClick={() => router.push(`/app/assistant?q=${encodeURIComponent(t(`assistant.prompts.${k}`))}`)}>{t(`assistant.prompts.${k}`)}</button>
+      <div className="ask-prompts">
+        {(["skills", "match", "plan"] as const).map((k, i) => (
+          <button key={k} type="button" className="ask-prompt" style={{ "--i": i } as React.CSSProperties} onClick={() => router.push(`/app/assistant?q=${encodeURIComponent(t(`assistant.prompts.${k}`))}`)}>
+            <span aria-hidden="true" className="ask-spark">✦</span><span className="bidi">{t(`assistant.prompts.${k}`)}</span>
+          </button>
         ))}
       </div>
     </form>

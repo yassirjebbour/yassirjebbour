@@ -5,6 +5,11 @@ import type { Messages } from "./index";
  * (الجواز، الطريق، الفرص، مقترحة / مؤكدة / بالدليل / موثّقة).
  * Plural leaves use Arabic plural categories: zero, one, two, few (3–10), many (11–99), other.
  */
+import { shell } from "./ext/shell";
+import { home } from "./ext/home";
+import { screens } from "./ext/screens";
+import { flow } from "./ext/flow";
+
 export const ary: Messages = {
   meta: {
     title: "BAWSALA — كتاشف شنو تقدر دير",
@@ -757,4 +762,8 @@ export const ary: Messages = {
     zgh: "الأمازيغية",
     ary: "الدارجة",
   },
+  shell: shell.ary,
+  home: home.ary,
+  screens: screens.ary,
+  flow: flow.ary,
 };

@@ -6,6 +6,11 @@ import type { Messages } from "./index";
  * ⵙ ⵓⵏⴰⴳⵉ / ⵜⵙⴱⴱⵜ ⵜⵜ ⵜⵙⵓⴷⴰⵙⵜ). Lines marked `// review` need a native-speaker check.
  * Plurals use French rules (0 and 1 → one), so every `one` form keeps "#".
  */
+import { shell } from "./ext/shell";
+import { home } from "./ext/home";
+import { screens } from "./ext/screens";
+import { flow } from "./ext/flow";
+
 export const zgh: Messages = {
   meta: {
     title: "BAWSALA — ⴰⴼ ⵎⴰ ⵜⵣⵎⵔⵜ ⴰⴷ ⵜⵙⴽⵔⵜ",
@@ -684,4 +689,8 @@ export const zgh: Messages = {
     zgh: "ⵜⴰⵎⴰⵣⵉⵖⵜ",
     ary: "ⵜⴰⴷⴰⵔⵉⵊⵜ",
   },
+  shell: shell.zgh,
+  home: home.zgh,
+  screens: screens.zgh,
+  flow: flow.zgh,
 };

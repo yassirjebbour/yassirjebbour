@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getT } from "@/i18n/server";
+import { AuthShell } from "@/components/public/auth-shell";
 import { SignUpForm } from "@/components/public/auth-forms";
 
 export async function generateMetadata(): Promise<Metadata> { const { t } = await getT(); return { title: t("auth.signup") }; }
@@ -7,9 +8,8 @@ export async function generateMetadata(): Promise<Metadata> { const { t } = awai
 export default async function Page() {
   const { t } = await getT();
   return (
-    <div className="auth-wrap"><div className="auth-card panel stack">
-      <div className="stack-sm"><h1>{t("auth.signup_title")}</h1><p className="muted">{t("auth.signup_sub")}</p></div>
+    <AuthShell title={t("auth.signup_title")} sub={t("auth.signup_sub")}>
       <SignUpForm />
-    </div></div>
+    </AuthShell>
   );
 }

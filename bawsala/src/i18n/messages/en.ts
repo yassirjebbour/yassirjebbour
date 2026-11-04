@@ -3,6 +3,11 @@
  * (enforced by the `Messages` type in index.ts and by tests/unit/i18n.test.ts).
  * Plural leaves use { one, other } (+ zero/two/few/many in Arabic); "#" is the number.
  */
+import { shell } from "./ext/shell";
+import { home } from "./ext/home";
+import { screens } from "./ext/screens";
+import { flow } from "./ext/flow";
+
 export const en = {
   meta: {
     title: "BAWSALA — Discover what you can do",
@@ -678,4 +683,8 @@ export const en = {
     zgh: "Tamazight",
     ary: "Darija",
   },
+  shell: shell.en,
+  home: home.en,
+  screens: screens.en,
+  flow: flow.en,
 };

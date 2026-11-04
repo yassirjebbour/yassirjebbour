@@ -1,12 +1,16 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
+import "../styles/home.css";
+import "../styles/screens.css";
+import "../styles/flow.css";
 import { getT } from "@/i18n/server";
 import { LOCALE_META } from "@/i18n/config";
 import { I18nProvider } from "@/components/i18n";
 import { ToastProvider } from "@/components/ui";
 import { ClientErrorReporter } from "@/components/client-errors";
 import { ServiceWorkerRegister } from "@/components/sw-register";
+import { MotionRuntime } from "@/components/motion";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getT();
@@ -25,13 +29,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  themeColor: [{ media: "(prefers-color-scheme: light)", color: "#F8F6EF" }, { media: "(prefers-color-scheme: dark)", color: "#0C1210" }],
+  themeColor: [{ media: "(prefers-color-scheme: light)", color: "#F8F6EF" }, { media: "(prefers-color-scheme: dark)", color: "#0A100E" }],
   width: "device-width",
   initialScale: 1,
 };
 
-// Applies the saved theme before paint (no flash). Only reads a non-sensitive UI preference.
-const THEME_SCRIPT = `try{var t=localStorage.getItem("bawsala.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}`;
+// Before paint: applies the saved theme (no flash) and enables CSS-only motion unless the user asked for
+// reduced motion. Only reads a non-sensitive UI preference.
+const THEME_SCRIPT = `try{var t=localStorage.getItem("bawsala.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("m-ok")}catch(e){}`;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { locale, messages, t } = await getT();
@@ -49,6 +54,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             {children}
             <ClientErrorReporter />
             <ServiceWorkerRegister />
+            <MotionRuntime />
           </ToastProvider>
         </I18nProvider>
       </body>

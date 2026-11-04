@@ -1,5 +1,10 @@
 import type { Messages } from "./index";
 
+import { shell } from "./ext/shell";
+import { home } from "./ext/home";
+import { screens } from "./ext/screens";
+import { flow } from "./ext/flow";
+
 export const ar: Messages = {
   meta: {
     title: "بوصلة — اكتشف ما تستطيع فعله",
@@ -675,4 +680,8 @@ export const ar: Messages = {
     zgh: "الأمازيغية",
     ary: "الدارجة",
   },
+  shell: shell.ar,
+  home: home.ar,
+  screens: screens.ar,
+  flow: flow.ar,
 };
