@@ -92,11 +92,33 @@ export function layoutSky(stars: SkyStar[]) {
   // The needle points at the strongest direction: the category with the most weight.
   let best = "communication", bestW = -1;
   for (const [cat, list] of byCat) { const w = list.reduce((acc, s) => acc + RANK[s.status], 0); if (w > bestW) { bestW = w; best = cat; } }
-  return { placed, edges, needle: stars.length ? SECTOR[best] : 0 };
+  return { placed, edges, needle: stars.length ? SECTOR[best] : 0, labelY: labelPositions(placed) };
+}
+
+/**
+ * Label rows that never overlap: labels sit beside their star (east or west of the compass), so two
+ * labels collide only when they are on the same side and close vertically. On each side, labels are
+ * kept at least LABEL_GAP apart (in the 400-unit sky space), then clamped inside the sky.
+ */
+const LABEL_GAP = 36;
+function labelPositions(placed: Array<{ id: string; x: number; y: number }>): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const east of [true, false]) {
+    const side = placed.filter((p) => (p.x >= C) === east).sort((a, b) => a.y - b.y || a.id.localeCompare(b.id));
+    const ys = side.map((p) => p.y);
+    // A crowded side (many skills) tightens the gap so the whole column still fits inside the sky.
+    const gap = ys.length > 1 ? Math.min(LABEL_GAP, (400 - 32) / (ys.length - 1)) : LABEL_GAP;
+    for (let i = 1; i < ys.length; i++) ys[i] = Math.max(ys[i], ys[i - 1] + gap);
+    // If the column ran past the bottom, shift it up as a block (keeps the order and the spacing).
+    const overflow = ys.length ? ys[ys.length - 1] - (400 - 16) : 0;
+    if (overflow > 0) for (let i = 0; i < ys.length; i++) ys[i] = Math.max(16 + i * gap, ys[i] - overflow);
+    side.forEach((p, i) => { out[p.id] = round(ys[i]); });
+  }
+  return out;
 }
 
 export function Constellation({ stars, labels = true, className, seed = "sky", ariaLabel }: { stars: SkyStar[]; labels?: boolean; className?: string; seed?: string; ariaLabel?: string }) {
-  const { placed, edges, needle } = layoutSky(stars);
+  const { placed, edges, needle, labelY } = layoutSky(stars);
   const r = rng(hash(seed));
   const dust = Array.from({ length: 42 }, () => ({ x: round(r() * 400), y: round(r() * 400), s: round(.5 + r() * 1.1), d: round(2 + r() * 4), dl: round(r() * 4) }));
   const key = stars.map((s) => `${s.id}:${s.status}`).join("|");
@@ -134,7 +156,7 @@ export function Constellation({ stars, labels = true, className, seed = "sky", a
       {labels ? (
         <div className="sky-labels" aria-hidden="true">
           {placed.map((s, i) => (
-            <span key={s.id} className={`sky-label ${s.x >= C ? "e" : "w"} st-${s.status}`} style={{ left: `${s.x / 4}%`, top: `${s.y / 4}%`, "--i": i } as Vars}>{s.label}</span>
+            <span key={s.id} className={`sky-label ${s.x >= C ? "e" : "w"} st-${s.status}`} style={{ left: `${s.x / 4}%`, top: `${(labelY[s.id] ?? s.y) / 4}%`, "--i": i } as Vars}>{s.label}</span>
           ))}
         </div>
       ) : null}

@@ -113,7 +113,13 @@
 .story-step.is-active .story-num { border-color: var(--gold); background: var(--gold-xl); color: var(--gold-dd); box-shadow: 0 0 0 6px color-mix(in srgb, var(--gold) 16%, transparent); transform: scale(1.06); }
 .story-text h3 { font-size: clamp(1.25rem, 1.05rem + .8vw, 1.6rem); font-weight: 700; }
 .story-text p { margin-top: 8px; color: var(--ink2); font-size: 1.04rem; max-width: 46ch; }
-@media (min-width: 900px) { .story-text { opacity: .4; transition: opacity var(--d3) var(--ease-out), transform var(--d3) var(--ease-out); transform: translateX(calc(-6px * var(--flip))); } .story-step.is-active .story-text { opacity: 1; transform: none; } }
+/* Inactive steps are de-emphasised by colour, never by opacity: --muted keeps WCAG AA (≥4.5:1) on paper. */
+@media (min-width: 900px) {
+  .story-text { transition: transform var(--d3) var(--ease-out); transform: translateX(calc(-6px * var(--flip))); }
+  .story-text h3, .story-text p { transition: color var(--d3) var(--ease-out); }
+  .story-step:not(.is-active) .story-text h3, .story-step:not(.is-active) .story-text p { color: var(--muted); }
+  .story-step.is-active .story-text { transform: none; }
+}
 .story-inline { grid-column: 1 / -1; display: flex; justify-content: center; }
 .story-inline .phone { width: min(280px, 78vw); }
 .story-stage { position: sticky; top: calc(var(--topbar) + 5vh); display: flex; flex-direction: column; align-items: center; gap: 12px; }
@@ -183,8 +189,8 @@
 .skill-card-head .badge { animation: enter-scale .5s var(--spring) both; }
 .skill-card-quote { margin-top: 14px; color: var(--ink2); border-inline-start: 3px solid var(--gold); padding-inline-start: 12px; font-size: 15px; }
 .skill-card-rows { list-style: none; margin: 18px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-.skill-card-rows li { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 12px; background: var(--sunk); color: var(--muted); font-size: 14px; opacity: .5; transform: translateY(3px); transition: opacity .5s var(--ease-out), transform .5s var(--ease-out), background .5s, color .5s; }
-.skill-card-rows li.on { opacity: 1; transform: none; color: var(--ink); background: var(--g700); }
+.skill-card-rows li { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 12px; background: var(--sunk); color: var(--muted); font-size: 14px; border: 1px dashed var(--line2); transform: translateY(3px); transition: border-color .5s, transform .5s var(--ease-out), background .5s, color .5s; }
+.skill-card-rows li.on { border-style: solid; border-color: transparent; transform: none; color: var(--ink); background: var(--g700); }
 .skill-card-rows .mark { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--sunk2); font-size: 12px; font-weight: 700; flex: none; transition: background .4s, color .4s; }
 .skill-card-rows li.on .mark { background: var(--g); color: var(--on-g); }
 .stamp { position: absolute; inset-inline-end: 18px; bottom: 54px; width: 86px; height: 86px; rotate: -12deg; animation: stamp .7s var(--spring) both; pointer-events: none; }

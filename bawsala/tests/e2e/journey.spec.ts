@@ -124,12 +124,23 @@ test("Arabic is RTL, Darija RTL, Tamazight renders Tifinagh LTR with the Tifinag
   expect(await page.evaluate(() => document.fonts.check('16px "Noto Sans Tifinagh"', "ⴱⴰⵡⵙⴰⵍⴰ"))).toBe(true);
 });
 
+/**
+ * Waits until every finite CSS animation/transition has finished, so the accessibility scan measures
+ * the page the student actually reads, not a frame in the middle of an entrance fade (semi-transparent
+ * text would be reported as low contrast). Infinite decorative loops (twinkling stars) are ignored.
+ * The axe rules, tags and the zero-violation threshold are unchanged.
+ */
+async function settle(page: import("@playwright/test").Page) {
+  await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== "running" || a.effect?.getTiming().iterations === Infinity), undefined, { timeout: 10_000 });
+}
+
 test("accessibility: no serious or critical axe violations on key pages", async ({ page }) => {
   const email = `a11y${uniq()}@test.local`;
   await signUp(page, email);
   const results: Record<string, string[]> = {};
   for (const path of ["/", "/signin", "/app/onboarding", "/app", "/app/passport", "/app/opportunities", "/app/assistant", "/app/settings"]) {
     await page.goto(path);
+    await settle(page);
     const r = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
     results[path] = r.violations.filter((v) => v.impact === "serious" || v.impact === "critical").map((v) => `${v.id} (${v.nodes.length})`);
   }
