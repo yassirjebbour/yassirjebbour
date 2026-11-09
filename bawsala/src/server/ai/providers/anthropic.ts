@@ -3,7 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import type { z } from "zod";
 import { effortFor, modelFor } from "../config";
-import { LlmError, type LlmMessage, type LlmProvider, type ToolSpec, type TurnEvent, type TurnResult, type Usage } from "./types";
+import { LlmError, type Attempt, type LlmMessage, type LlmProvider, type ToolSpec, type TurnEvent, type TurnResult, type Usage } from "./types";
 
 type BetaMessageParam = Anthropic.Beta.BetaMessageParam;
 
@@ -34,8 +34,21 @@ function toAnthropic(messages: LlmMessage[]): BetaMessageParam[] {
   });
 }
 
-function usageOf(u: { input_tokens?: number | null; output_tokens?: number | null; cache_read_input_tokens?: number | null; cache_creation_input_tokens?: number | null }): Usage {
+type RawUsage = { input_tokens?: number | null; output_tokens?: number | null; cache_read_input_tokens?: number | null; cache_creation_input_tokens?: number | null };
+function usageOf(u: RawUsage): Usage {
   return { input: u.input_tokens ?? 0, output: u.output_tokens ?? 0, cacheRead: u.cache_read_input_tokens ?? 0, cacheWrite: u.cache_creation_input_tokens ?? 0 };
+}
+
+/**
+ * Every billed attempt behind a response. With server-side fallbacks, top-level usage covers only the attempt that
+ * produced the message; usage.iterations lists each attempt (including the refused one and the fallback model's),
+ * and each is billed at the model that ran it.
+ */
+export function attemptsOf(usage: RawUsage & { iterations?: Array<RawUsage & { model?: string | null }> | null }, requested: string): { usage: Usage; attempts: Attempt[] } {
+  const its = usage.iterations?.length ? usage.iterations : [usage];
+  const attempts = its.map((it) => ({ model: ("model" in it && it.model) || requested, ...usageOf(it) }));
+  const total = attempts.reduce((t, a) => ({ input: t.input + a.input, output: t.output + a.output, cacheRead: t.cacheRead + a.cacheRead, cacheWrite: t.cacheWrite + a.cacheWrite }), { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 });
+  return { usage: total, attempts };
 }
 
 export class AnthropicProvider implements LlmProvider {
@@ -58,17 +71,19 @@ export class AnthropicProvider implements LlmProvider {
       ...(useFallbacks ? { betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" as const } : {}),
     };
     let message: Anthropic.Beta.BetaMessage;
+    let shown = false; // text already sent to the student
     for (let attempt = 0; ; attempt++) {
       try {
         const stream = this.client.beta.messages.stream(params as Anthropic.Beta.MessageCreateParamsStreaming, { signal: req.signal });
         for await (const ev of stream) {
-          if (ev.type === "content_block_delta" && ev.delta.type === "text_delta") yield { type: "text", delta: ev.delta.text };
+          if (ev.type === "content_block_delta" && ev.delta.type === "text_delta") { shown = true; yield { type: "text", delta: ev.delta.text }; }
         }
         message = await stream.finalMessage();
         break;
       } catch (e) {
-        // With eager input streaming the SDK may fail to parse a truncated tool input: re-issue once.
-        if (!(e instanceof Anthropic.APIError) && !(e instanceof Anthropic.APIUserAbortError) && !(e instanceof Error && e.name === "AbortError") && attempt < 1) continue;
+        // With eager input streaming the SDK may fail to parse a truncated tool input: re-issue once, but only if
+        // no text was shown yet; a retry after text would stream the answer a second time.
+        if (!shown && !(e instanceof Anthropic.APIError) && !(e instanceof Anthropic.APIUserAbortError) && !(e instanceof Error && e.name === "AbortError") && attempt < 1) continue;
         throw mapError(e);
       }
     }
@@ -82,7 +97,7 @@ export class AnthropicProvider implements LlmProvider {
       text,
       toolCalls,
       raw: message.content,
-      usage: usageOf(message.usage),
+      ...attemptsOf(message.usage, model),
       model: message.model ?? model,
     };
     yield { type: "done", result };
@@ -101,7 +116,7 @@ export class AnthropicProvider implements LlmProvider {
         },
         { signal: req.signal },
       );
-      return { data: (res.parsed_output as T | null) ?? null, usage: usageOf(res.usage), model: res.model ?? model, refused: res.stop_reason === "refusal" };
+      return { data: (res.parsed_output as T | null) ?? null, ...attemptsOf(res.usage, model), model: res.model ?? model, refused: res.stop_reason === "refusal" };
     } catch (e) {
       throw mapError(e);
     }

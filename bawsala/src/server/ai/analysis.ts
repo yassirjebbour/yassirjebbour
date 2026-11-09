@@ -60,7 +60,7 @@ export async function analyzeText(text: string, opts: { userId: string | null; a
       schema: ExtractionSchema,
       signal: opts.signal,
     });
-    await recordUsage({ userId: opts.userId, feature: "skill_extraction", engine: provider.id, model: res.model, promptVersion: PROMPT_VERSIONS.extract, ...res.usage, ok: !!res.data, latencyMs: Date.now() - t0, errorCode: res.refused ? "refusal" : null });
+    await recordUsage({ userId: opts.userId, feature: "skill_extraction", engine: provider.id, model: res.model, promptVersion: PROMPT_VERSIONS.extract, ...res.usage, attempts: res.attempts, ok: !!res.data, latencyMs: Date.now() - t0, errorCode: res.refused ? "refusal" : null });
     const valid = new Set(SKILLS.map((s) => s.id));
     let discarded = 0;
     const ai: Candidate[] = [];

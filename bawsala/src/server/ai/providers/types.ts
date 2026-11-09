@@ -18,13 +18,18 @@ export type LlmMessage =
 export interface ToolSpec { name: string; description: string; inputSchema: Record<string, unknown> }
 export interface ToolCall { id: string; name: string; input: unknown }
 export interface Usage { input: number; output: number; cacheRead: number; cacheWrite: number }
+/** One billed model call behind a response: the main model, and any server-side fallback model. */
+export interface Attempt extends Usage { model: string }
 
 export interface TurnResult {
   stopReason: "end" | "tool_use" | "max_tokens" | "refusal" | "other";
   text: string;
   toolCalls: ToolCall[];
   raw: unknown;
+  /** Tokens summed over every attempt. */
   usage: Usage;
+  /** Each billed attempt with its model, for pricing (top-level usage covers only the last attempt). */
+  attempts: Attempt[];
   model: string;
 }
 
@@ -38,5 +43,5 @@ export class LlmError extends Error {
 export interface LlmProvider {
   id: string;
   streamTurn(req: { task: AiTask; system: string; messages: LlmMessage[]; tools: ToolSpec[]; signal?: AbortSignal; maxTokens?: number }): AsyncGenerator<TurnEvent>;
-  structured<T>(req: { task: AiTask; system: string; user: string; schema: z.ZodType<T>; signal?: AbortSignal }): Promise<{ data: T | null; usage: Usage; model: string; refused: boolean }>;
+  structured<T>(req: { task: AiTask; system: string; user: string; schema: z.ZodType<T>; signal?: AbortSignal }): Promise<{ data: T | null; usage: Usage; attempts: Attempt[]; model: string; refused: boolean }>;
 }

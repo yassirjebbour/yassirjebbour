@@ -17,7 +17,8 @@ import { TOOLS, TOOL_BY_NAME } from "./tools";
 import { jsonSchemaFor, runTool, type ToolContext } from "./tools/registry";
 import { CHAT_SYSTEM, contextBlock, type StudentContext } from "./prompts";
 import { PROMPT_VERSIONS } from "./config";
-import { recordUsage } from "./usage";
+import { recordUsage, spentTodayUsd } from "./usage";
+import { env } from "../env";
 import { renderBasic, detectIntent } from "./basic";
 import { isEnabled } from "../flags";
 import { addMessage, getConversation, type Message, type ToolCallRecord } from "../repo/conversations";
@@ -148,6 +149,9 @@ export async function* runChat(opts: {
       const tools: ToolSpec[] = TOOLS.map((t) => ({ name: t.name, description: t.description, inputSchema: jsonSchemaFor(t) }));
       let calls = 0;
       for (let round = 0; round < MAX_ROUNDS; round++) {
+        // The platform budget is checked before the turn (route) and again before every further tool round, so one
+        // long turn cannot run far past it. Rounds already done are kept; the answer then ends here.
+        if (round > 0 && (await spentTodayUsd()) >= env().AI_DAILY_BUDGET_USD) { log.warn("chat.budget_reached_mid_turn", { conv: conversationId, round }); break; }
         const t0 = Date.now();
         let result: TurnResult | null = null;
         try {
@@ -161,7 +165,7 @@ export async function* runChat(opts: {
           throw e;
         }
         if (!result) break;
-        await recordUsage({ userId: user.id, feature: "chat", engine: provider!.id, model: result.model, promptVersion: PROMPT_VERSIONS.chat, ...result.usage, ok: true, latencyMs: Date.now() - t0, errorCode: result.stopReason === "refusal" ? "refusal" : null });
+        await recordUsage({ userId: user.id, feature: "chat", engine: provider!.id, model: result.model, promptVersion: PROMPT_VERSIONS.chat, ...result.usage, attempts: result.attempts, ok: true, latencyMs: Date.now() - t0, errorCode: result.stopReason === "refusal" ? "refusal" : null });
         if (result.stopReason === "refusal") { status = "error"; break; }
         if (result.stopReason !== "tool_use" || !result.toolCalls.length) break;
         if (result.stopReason === "tool_use" && result.toolCalls.length && calls >= MAX_TOOL_CALLS) break;

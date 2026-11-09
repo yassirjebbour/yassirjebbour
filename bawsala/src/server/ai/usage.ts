@@ -1,11 +1,14 @@
 import "server-only";
 import { asSystem } from "../db";
-import { estimateCostUsd } from "./config";
+import { costOfAttempts, estimateCostUsd, isPricedModel } from "./config";
+import type { Attempt } from "./providers/types";
 import { log } from "../log";
 
 export interface UsageRecord {
   userId: string | null; feature: string; engine: string; model?: string | null; promptVersion?: string | null;
   input?: number; output?: number; cacheRead?: number; cacheWrite?: number; ok: boolean; latencyMs?: number; errorCode?: string | null;
+  /** Every billed attempt (main and fallback models); when present, the cost is the sum over them. */
+  attempts?: Attempt[];
 }
 
 /** Estimated model spend across all users since midnight UTC (for the platform-wide daily budget). */
@@ -15,7 +18,10 @@ export async function spentTodayUsd(): Promise<number> {
 }
 
 export async function recordUsage(u: UsageRecord) {
-  const cost = u.model ? estimateCostUsd(u.model, { input: u.input ?? 0, output: u.output ?? 0, cacheRead: u.cacheRead, cacheWrite: u.cacheWrite }) : 0;
+  const cost = u.attempts?.length ? costOfAttempts(u.attempts)
+    : u.model ? estimateCostUsd(u.model, { input: u.input ?? 0, output: u.output ?? 0, cacheRead: u.cacheRead, cacheWrite: u.cacheWrite }) : 0;
+  const unpriced = [...new Set((u.attempts ?? (u.model ? [{ model: u.model }] : [])).map((a) => a.model).filter((m) => !isPricedModel(m)))];
+  if (unpriced.length) log.warn("ai.usage.unpriced_model", { models: unpriced, note: "charged at the highest known rate; add its price in ai/config.ts" });
   log.info("ai.usage", { feature: u.feature, engine: u.engine, model: u.model, in: u.input, out: u.output, cr: u.cacheRead, ok: u.ok, ms: u.latencyMs, cost, err: u.errorCode });
   await asSystem((tx) =>
     tx.query(

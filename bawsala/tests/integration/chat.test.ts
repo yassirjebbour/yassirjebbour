@@ -16,9 +16,9 @@ function fakeProvider(turns: Array<{ text?: string; tools?: Array<{ name: string
       const t = turns[Math.min(i++, turns.length - 1)];
       if (t.text) for (const w of t.text.split(" ")) yield { type: "text", delta: w + " " };
       const toolCalls = (t.tools ?? []).map((x, k) => ({ id: `call_${i}_${k}`, name: x.name, input: x.input }));
-      yield { type: "done", result: { stopReason: toolCalls.length ? "tool_use" : "end", text: t.text ?? "", toolCalls, raw: [{ type: "text", text: t.text ?? "" }], usage: { input: 1000, output: 100, cacheRead: 800, cacheWrite: 0 }, model: "claude-opus-5-5" } };
+      yield { type: "done", result: { stopReason: toolCalls.length ? "tool_use" : "end", text: t.text ?? "", toolCalls, raw: [{ type: "text", text: t.text ?? "" }], usage: { input: 1000, output: 100, cacheRead: 800, cacheWrite: 0 }, attempts: [{ model: "claude-opus-5-5", input: 1000, output: 100, cacheRead: 800, cacheWrite: 0 }], model: "claude-opus-5-5" } };
     },
-    async structured() { return { data: null, usage: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, model: "fake", refused: false }; },
+    async structured() { return { data: null, usage: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, attempts: [], model: "fake", refused: false }; },
   };
 }
 
@@ -101,7 +101,7 @@ describe("chat orchestrator", () => {
     const provider: LlmProvider = {
       id: "slow",
       async *streamTurn(req) { yield { type: "text", delta: "partial " }; ctrl.abort(); if (req.signal?.aborted) { const { LlmError } = await import("@/server/ai/providers/types"); throw new LlmError("cancelled", "x"); } },
-      async structured() { return { data: null, usage: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, model: "x", refused: false }; },
+      async structured() { return { data: null, usage: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, attempts: [], model: "x", refused: false }; },
     };
     setProviderForTests(provider);
     const events = await collect(runChat({ user, conversationId: conv.id, userText: "hi", signal: ctrl.signal }));
