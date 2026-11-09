@@ -1,0 +1,1386 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#030B16">
+<meta name="description" content="BAWSALA — discover what you can do, not just what you studied.">
+<title>BAWSALA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap">
+<style>
+/* =====================================================================
+   BAWSALA v3 — one file, seven stations.
+   Palette is five colours, nothing else. Alpha variants of the same five
+   are used for lines and soft fills; no new hue is ever introduced.
+     --void   #030B16  background
+     --navy   #071A2F  surfaces
+     --teal   #19E6C1  interaction · progress · proof
+     --amber  #FFB547  opportunity — and only opportunity
+     --white  #FFFFFF  text
+   Typography: IBM Plex Sans + IBM Plex Sans Arabic only. Hierarchy comes
+   from weight, size and tracking, never from a second family.
+
+   Motion inventory (24): 1 headline word rise · 2 mark stroke draw ·
+   3 compass needle follows pointer · 4 needle idle sway · 5 orbit spin ·
+   6 magnetic CTA · 7 direction-aware screen transitions (RTL-flipped) ·
+   8 journey spine fill + live pulse · 9 typing playback · 10 live detail
+   meter · 11 chip spring press · 12 scan-line sweep · 13 keyword highlight
+   cascade · 14 skill chips pop · 15 stage ticks · 16 passport 3D tilt ·
+   17 count-up numbers · 18 confirm stamp · 19 readiness ring draw ·
+   20 gap ladder fill · 21 proof particle burst + meter rise · 22 recruiter
+   typing dots · 23 feedback bars fill · 24 impact 10→1 cascade · + toasts.
+   All of it collapses under prefers-reduced-motion.
+   ===================================================================== */
+:root{
+  --void:#030B16; --navy:#071A2F; --teal:#19E6C1; --amber:#FFB547; --white:#FFFFFF;
+  --t2:rgba(255,255,255,.72); --t3:rgba(255,255,255,.56);
+  --line:rgba(255,255,255,.09); --line2:rgba(255,255,255,.18); --lift:rgba(255,255,255,.04);
+  --teal-a:rgba(25,230,193,.10); --teal-b:rgba(25,230,193,.30);
+  --amber-a:rgba(255,181,71,.12); --amber-b:rgba(255,181,71,.40);
+  --font:"IBM Plex Sans","IBM Plex Sans Arabic",system-ui,-apple-system,sans-serif;
+  --num:"IBM Plex Sans","IBM Plex Sans Arabic",system-ui,sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1); --spring:cubic-bezier(.34,1.56,.64,1);
+  --gut:clamp(20px,4vw,56px); --dir:1; --origin:left;
+}
+[dir=rtl]{--dir:-1;--origin:right;--font:"IBM Plex Sans Arabic","IBM Plex Sans",system-ui,sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--void);-webkit-text-size-adjust:100%;scroll-padding-top:120px}
+body{margin:0;min-height:100dvh;background:var(--void);color:var(--white);font:400 16px/1.6 var(--font);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(70% 50% at 85% -10%,rgba(25,230,193,.10),transparent 60%),radial-gradient(60% 40% at 0% 110%,rgba(7,26,47,.9),transparent 70%)}
+[dir=rtl] body::before{transform:scaleX(-1)}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+p{margin:0}
+.sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:2px solid var(--teal);outline-offset:3px;border-radius:8px}
+[tabindex="-1"]:focus{outline:none}
+::selection{background:var(--teal);color:var(--void)}
+bdi{unicode-bidi:isolate}
+.num{font-family:var(--num);font-variant-numeric:tabular-nums}
+
+/* ---------- Chrome ---------- */
+.proto{position:relative;z-index:50;text-align:center;font-size:12px;letter-spacing:.04em;color:var(--t3);padding:7px var(--gut);border-bottom:1px solid var(--line);background:var(--void)}
+[dir=rtl] .proto{letter-spacing:0}
+.top{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:20px;height:68px;padding:0 var(--gut);background:rgba(3,11,22,.82);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+.logo{display:inline-flex;align-items:center;gap:10px;background:none;border:0;padding:4px;color:var(--white);flex:none}
+.logo svg{width:28px;height:28px;color:var(--teal);transition:transform .5s var(--spring)}
+.logo:hover svg{transform:rotate(-12deg)}
+.logo b{font-family:"IBM Plex Sans",sans-serif;font-weight:600;letter-spacing:.16em;font-size:15px}
+.logo .ar-n{font-family:"IBM Plex Sans Arabic",sans-serif;color:var(--t3);font-size:14px;padding-inline-start:10px;border-inline-start:1px solid var(--line2);line-height:1}
+.bw-bowl{fill:none;stroke:currentColor;stroke-linecap:round}
+.bw-dot{fill:currentColor}
+.spine{flex:1;display:flex;justify-content:center;min-width:0}
+.spine ol{list-style:none;display:flex;align-items:center;margin:0;padding:0}
+.spine li{display:flex;align-items:center}
+.spine li+li::before{content:"";width:22px;height:1.5px;background:var(--line2);margin:0 2px;transition:background .6s var(--ease)}
+.spine li.lit+li.lit::before{background:var(--teal)}
+.spine button{display:flex;align-items:center;gap:8px;background:none;border:0;color:var(--t3);font-size:13px;font-weight:500;padding:8px;border-radius:999px;transition:color .2s,background .2s}
+.spine button:hover:not(:disabled){color:var(--white);background:var(--lift)}
+.spine button:disabled{cursor:default;opacity:.45}
+.spine .dot{position:relative;width:10px;height:10px;border-radius:50%;border:1.5px solid var(--line2);flex:none;transition:all .4s var(--ease)}
+.spine .done .dot{background:var(--teal);border-color:var(--teal)}
+.spine .now .dot{border-color:var(--teal);background:var(--void)}
+.spine .now .dot::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:1.5px solid var(--teal);animation:pulse 2.2s var(--ease) infinite}
+.spine .now button{color:var(--white)}
+.spine .lbl{white-space:nowrap}
+@media (max-width:1240px){.spine li:not(.now) .lbl{display:none}}
+.tools{display:flex;align-items:center;gap:8px;flex:none;margin-inline-start:auto}
+.langs{display:flex;padding:3px;border:1px solid var(--line2);border-radius:999px}
+.langs button{min-width:40px;height:32px;padding:0 10px;border:0;border-radius:999px;background:none;color:var(--t2);font-size:13px;font-weight:600;transition:background .25s,color .25s}
+.langs button[lang=ar]{font-family:"IBM Plex Sans Arabic",sans-serif}
+.langs button[aria-pressed=true]{background:var(--white);color:var(--void)}
+.iconbtn{width:40px;height:40px;border-radius:50%;border:1px solid var(--line2);background:none;display:grid;place-items:center;color:var(--t2);transition:color .2s,border-color .2s,transform .5s var(--spring)}
+.iconbtn:hover{color:var(--white);border-color:var(--white);transform:rotate(-90deg)}
+.iconbtn svg{width:18px;height:18px}
+.mprog{display:none;position:sticky;top:68px;z-index:39;padding:10px var(--gut);background:rgba(3,11,22,.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);font-size:13px;color:var(--t2);align-items:center;gap:14px}
+.mp-bar{flex:1;height:4px;border-radius:4px;background:var(--line2);overflow:hidden}
+.mp-bar i{display:block;height:100%;background:var(--teal);border-radius:4px;transition:width .8s var(--ease)}
+@media (max-width:900px){.spine{display:none}.mprog{display:flex}body[data-screen=welcome] .mprog{display:none}}
+body[data-screen=welcome] .spine{visibility:hidden}
+@media (max-width:480px){.logo .ar-n{display:none}.top{gap:10px}}
+
+/* ---------- Layout ---------- */
+main{position:relative;z-index:1}
+.screen{max-width:1280px;margin:0 auto;padding:clamp(36px,7vh,88px) var(--gut) 140px}
+.screen.enter{animation:sIn .6s var(--ease) both}
+.screen.leave{animation:sOut .18s ease both}
+.screen.fade{animation:fadeIn .4s ease both}
+@keyframes sIn{from{opacity:0;transform:translateX(calc(var(--d) * var(--dir) * 56px))}to{opacity:1;transform:none}}
+@keyframes sOut{to{opacity:0;transform:translateX(calc(var(--d) * var(--dir) * -28px))}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.narrow{max-width:860px}
+.kicker{display:inline-flex;align-items:center;gap:10px;margin:0 0 22px;font-size:12px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--teal)}
+.kicker::before{content:"";width:22px;height:1.5px;background:var(--teal)}
+[dir=rtl] .kicker{letter-spacing:0;font-size:14px;text-transform:none}
+.display{margin:0;font-size:clamp(52px,7.6vw,128px);line-height:.98;letter-spacing:-.045em;font-weight:600;text-wrap:balance}
+[dir=rtl] .display{letter-spacing:0;line-height:1.24;font-weight:700;font-size:clamp(46px,6.8vw,112px)}
+.h1{margin:0;font-size:clamp(40px,5.4vw,88px);line-height:1.02;letter-spacing:-.038em;font-weight:600;max-width:17ch;text-wrap:balance}
+[dir=rtl] .h1{letter-spacing:0;line-height:1.32;font-weight:700;font-size:clamp(36px,4.8vw,76px)}
+.sub{margin-top:20px;font-size:clamp(17px,1.35vw,20px);line-height:1.6;color:var(--t2);max-width:56ch}
+[dir=rtl] .sub{line-height:1.85}
+.label{display:block;font-size:14px;font-weight:600;color:var(--white);margin-bottom:10px}
+.hint{font-size:14px;color:var(--t3);margin-top:8px}
+.err{display:flex;gap:8px;align-items:center;color:var(--white);font-size:14px;margin-top:10px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.06);border-inline-start:3px solid var(--white)}
+.err svg{width:16px;height:16px;flex:none}
+.panel{background:var(--navy);border:1px solid var(--line);border-radius:28px;padding:clamp(22px,3vw,36px)}
+.stack>*+*{margin-top:28px}
+.actions{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:40px}
+fieldset{border:0;margin:0;padding:0;min-width:0}
+legend{padding:0}
+
+/* ---------- Buttons ---------- */
+.btn{--h:48px;position:relative;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:var(--h);padding:0 24px;border-radius:999px;border:1px solid transparent;background:none;color:var(--white);font-size:15px;font-weight:600;line-height:1.2;text-decoration:none;white-space:nowrap;transition:transform .35s var(--spring),background .25s,border-color .25s,color .25s,box-shadow .35s var(--ease),opacity .25s}
+.btn:active:not(:disabled){transform:scale(.96)}
+.btn svg{width:18px;height:18px;flex:none}
+.btn.primary{background:var(--teal);color:var(--void);box-shadow:0 12px 34px -14px rgba(25,230,193,.75)}
+.btn.primary:hover:not(:disabled){box-shadow:0 18px 44px -12px rgba(25,230,193,.95)}
+.btn.amber{background:var(--amber);color:var(--void);box-shadow:0 12px 34px -14px rgba(255,181,71,.75)}
+.btn.amber:hover:not(:disabled){box-shadow:0 18px 44px -12px rgba(255,181,71,.95)}
+.btn.ghost{border-color:var(--line2)}
+.btn.ghost:hover:not(:disabled){border-color:var(--white)}
+.btn.link{--h:36px;padding:0 6px;color:var(--teal)}
+.btn.link:hover{text-decoration:underline;text-underline-offset:4px}
+.btn.sm{--h:40px;padding:0 16px;font-size:14px}
+.btn.lg{--h:56px;padding:0 30px;font-size:16px}
+.btn.xl{--h:66px;padding:0 34px;font-size:17px}
+.btn:disabled{opacity:.38;cursor:not-allowed;box-shadow:none}
+.btn.amber:disabled{opacity:1;background:var(--amber-a);color:var(--amber);border-color:var(--amber-b)}
+[dir=rtl] .flip{transform:scaleX(-1)}
+@media (max-width:560px){.actions .btn{flex:1 1 100%}.btn{white-space:normal;text-align:center}}
+
+/* ---------- Inputs & chips ---------- */
+.input,.textarea{width:100%;background:var(--lift);border:1px solid var(--line2);border-radius:16px;color:var(--white);font-size:17px;padding:16px 18px;transition:border-color .25s,box-shadow .3s var(--ease),background .25s}
+.textarea{min-height:190px;resize:vertical;line-height:1.7}
+.input::placeholder,.textarea::placeholder{color:rgba(255,255,255,.4)}
+.input:hover,.textarea:hover{border-color:rgba(255,255,255,.32)}
+.input:focus,.textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 4px rgba(25,230,193,.14);background:rgba(25,230,193,.03)}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{min-height:46px;padding:0 20px;border-radius:999px;border:1px solid var(--line2);background:none;color:var(--t2);font-size:15px;font-weight:500;transition:background .25s,color .25s,border-color .25s,transform .4s var(--spring)}
+.chip:hover{border-color:var(--white);color:var(--white)}
+.chip[aria-pressed=true]{background:var(--teal);border-color:var(--teal);color:var(--void);font-weight:600;animation:press .45s var(--spring)}
+@keyframes press{0%{transform:scale(1)}40%{transform:scale(.92)}100%{transform:scale(1)}}
+
+/* ---------- Welcome ---------- */
+.hero{position:relative;min-height:calc(100dvh - 190px);display:flex;align-items:center}
+.hero-copy{position:relative;z-index:2;max-width:1120px}
+.display .w{display:inline-block;opacity:0;transform:translateY(.42em);animation:wRise .9s var(--ease) forwards;animation-delay:calc(var(--i) * 70ms + 120ms)}
+.display em{font-style:normal;color:var(--teal);position:relative;white-space:nowrap}
+.display em::after{content:"";position:absolute;inset-inline:0;bottom:.04em;height:.06em;background:var(--teal);transform:scaleX(0);transform-origin:var(--origin);animation:line 1s var(--ease) 1.1s forwards;border-radius:4px}
+[dir=rtl] .display em::after{bottom:-.02em}
+@keyframes wRise{to{opacity:1;transform:none}}
+@keyframes line{to{transform:scaleX(1)}}
+.rise{opacity:0;animation:wRise .9s var(--ease) forwards;animation-delay:calc(var(--i) * 70ms + 120ms);transform:translateY(16px)}
+.lede{margin-top:30px;font-size:clamp(18px,1.5vw,22px);line-height:1.6;color:var(--t2);max-width:50ch}
+[dir=rtl] .lede{line-height:1.85}
+.ctas{display:flex;flex-wrap:wrap;gap:14px;margin-top:40px}
+.loop{display:flex;flex-wrap:wrap;align-items:center;gap:10px;list-style:none;padding:0;margin:56px 0 0;color:var(--t3);font-size:13px;font-weight:500;letter-spacing:.08em;text-transform:uppercase}
+[dir=rtl] .loop{letter-spacing:0;text-transform:none;font-size:14px}
+.loop li+li::before{content:"→";margin-inline-end:10px;color:var(--teal)}
+[dir=rtl] .loop li+li::before{content:"←"}
+.dial{position:absolute;z-index:1;inset-inline-end:-14%;top:50%;width:min(92vh,800px);aspect-ratio:1;transform:translateY(-50%);pointer-events:none}
+.dial svg{width:100%;height:100%;overflow:visible}
+.d-ring{fill:none;stroke:var(--line2);stroke-width:1}
+.tk{stroke:rgba(255,255,255,.18);stroke-width:1}
+.tk.big{stroke:rgba(255,255,255,.45);stroke-width:1.5}
+.d-orbit{fill:none;stroke:var(--teal-b);stroke-width:1;stroke-dasharray:2 10;transform-origin:200px 200px;animation:spin 60s linear infinite}
+.d-glow{fill:url(#glow)}
+.needle{transform-origin:200px 200px;transform:rotate(var(--a,32deg));transition:transform 1.1s var(--ease)}
+.needle line{stroke:var(--teal);stroke-width:2;stroke-linecap:round}
+.needle circle{fill:var(--teal)}
+.sway{transform-origin:200px 200px;animation:sway 7s ease-in-out infinite}
+.d-mark .bowl{fill:none;stroke:var(--white);stroke-width:2.2;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100;animation:draw 1.8s var(--ease) .3s forwards}
+.d-mark .mdot{fill:var(--teal);transform-origin:16px 6.4px;transform:scale(0);animation:pop .6s var(--spring) 1.6s forwards}
+.d-hub{fill:var(--teal)}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes pop{to{transform:scale(1)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes sway{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+@keyframes pulse{0%{transform:scale(.6);opacity:1}100%{transform:scale(1.6);opacity:0}}
+@media (max-width:900px){.dial{width:150vw;max-width:620px;top:auto;bottom:-34%;inset-inline-end:-46%;transform:none;opacity:.5}.hero{align-items:flex-start;min-height:calc(100dvh - 160px)}}
+
+/* ---------- Story ---------- */
+.meter{margin-top:14px;display:grid;gap:10px}
+.meter .bar{height:6px;border-radius:6px;background:var(--line2);overflow:hidden}
+.meter .bar i{display:block;height:100%;width:4%;border-radius:6px;background:rgba(255,255,255,.55);transition:width .5s var(--ease),background .4s}
+.meter[data-band=ok] .bar i{background:rgba(25,230,193,.55)}
+.meter[data-band=rich] .bar i{background:var(--teal)}
+.meter p{font-size:14px;color:var(--t2)}
+.meter b{color:var(--white);font-weight:600}
+.row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.between{justify-content:space-between}
+
+/* ---------- Analysis ---------- */
+.scan{position:relative;overflow:hidden;margin-top:44px}
+.scanline{position:absolute;inset-inline:0;top:-40%;height:40%;background:linear-gradient(to bottom,transparent,rgba(25,230,193,.16),transparent);animation:scan 2.4s cubic-bezier(.65,0,.35,1) infinite;pointer-events:none}
+@keyframes scan{to{top:110%}}
+.scan-text{font-size:clamp(18px,1.6vw,22px);line-height:1.8;color:var(--t3);max-width:70ch}
+[dir=rtl] .scan-text{line-height:2}
+.scan-text mark{background:transparent;color:inherit;border-radius:5px;padding:0 3px;transition:background .45s var(--ease),color .45s}
+.scan-text mark.lit{background:rgba(25,230,193,.2);color:var(--white)}
+.an-grid{display:grid;gap:36px;margin-top:40px}
+@media (min-width:900px){.an-grid{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}}
+.stages{list-style:none;margin:0;padding:0;display:grid;gap:16px}
+.stages li{display:flex;align-items:center;gap:14px;color:var(--t3);font-weight:500;transition:color .3s}
+.stages .st{width:26px;height:26px;border-radius:50%;border:2px solid var(--line2);display:grid;place-items:center;flex:none;transition:all .3s}
+.stages .st svg{width:14px;height:14px;opacity:0;transform:scale(.4);transition:all .4s var(--spring)}
+.stages .on{color:var(--white)}
+.stages .on .st{border-color:var(--teal);border-top-color:transparent;animation:spin .8s linear infinite}
+.stages .ok{color:var(--t2)}
+.stages .ok .st{background:var(--teal);border-color:var(--teal);color:var(--void);animation:none}
+.stages .ok .st svg{opacity:1;transform:none}
+.found{display:flex;flex-wrap:wrap;gap:10px;min-height:48px;margin-top:12px}
+.pill{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--teal-b);background:var(--teal-a);font-size:14px;font-weight:500;animation:chipIn .55s var(--spring) both}
+.pill i{width:7px;height:7px;border-radius:50%;background:var(--teal)}
+@keyframes chipIn{from{opacity:0;transform:translateY(10px) scale(.7)}to{opacity:1;transform:none}}
+.note{margin-top:44px;font-size:13px;color:var(--t3);display:flex;gap:8px;align-items:flex-start}
+.note svg{width:16px;height:16px;flex:none;margin-top:2px}
+
+/* ---------- Passport ---------- */
+.pp-head{display:grid;gap:40px;align-items:end}
+@media (min-width:1000px){.pp-head{grid-template-columns:minmax(0,1.35fr) minmax(320px,.65fr)}}
+.pcard{position:relative;border-radius:30px;padding:28px;min-height:250px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;background:radial-gradient(120% 110% at 100% 0%,rgba(25,230,193,.24),transparent 55%),var(--navy);border:1px solid var(--line2);box-shadow:0 30px 70px -40px rgba(25,230,193,.5);transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .5s var(--ease)}
+[dir=rtl] .pcard{background:radial-gradient(120% 110% at 0% 0%,rgba(25,230,193,.24),transparent 55%),var(--navy)}
+.pcard::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,transparent 0 22px,rgba(255,255,255,.025) 22px 23px);pointer-events:none}
+.pc-id{font-size:11px;font-weight:600;letter-spacing:.22em;color:var(--t3)}
+[dir=rtl] .pc-id{letter-spacing:0;font-size:13px}
+.pc-name{font-size:28px;font-weight:600;letter-spacing:-.02em;margin-top:6px}
+.pc-meta{color:var(--t2);font-size:14px}
+.pc-n{display:flex;align-items:baseline;gap:10px}
+.pc-n b{font-family:var(--num);font-size:84px;font-weight:600;line-height:.9;letter-spacing:-.04em;color:var(--teal)}
+.pc-n span{color:var(--t2);font-size:14px}
+.pc-mark{position:absolute;top:24px;inset-inline-end:24px;width:44px;height:44px;color:var(--teal)}
+.skills{list-style:none;margin:48px 0 0;padding:0;display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(min(100%,350px),1fr))}
+.sk{position:relative;display:flex;flex-direction:column;gap:14px;padding:24px;border-radius:24px;background:var(--navy);border:1px solid var(--line);transition:border-color .35s,box-shadow .35s,opacity .35s,transform .45s var(--spring);animation:chipIn .6s var(--ease) both;animation-delay:calc(var(--i) * 45ms)}
+.sk:hover{border-color:var(--line2)}
+.sk h3{margin:0;font-size:20px;font-weight:600;letter-spacing:-.01em;padding-inline-end:40px}
+[dir=rtl] .sk h3{letter-spacing:0}
+.sk.confirmed{border-color:var(--teal);box-shadow:inset 0 0 0 1px var(--teal),0 20px 50px -30px rgba(25,230,193,.55)}
+.sk.removed{opacity:.42}
+.sk.removed .ev,.sk.removed .conf{display:none}
+.sk.stamp{animation:stamp .55s var(--spring)}
+@keyframes stamp{0%{transform:scale(1)}35%{transform:scale(.97)}100%{transform:scale(1)}}
+.sk-check{position:absolute;top:20px;inset-inline-end:20px;width:30px;height:30px;border-radius:50%;background:var(--teal);color:var(--void);display:grid;place-items:center;transform:scale(0) rotate(-45deg);transition:transform .5s var(--spring)}
+.sk-check svg{width:16px;height:16px}
+.sk.confirmed .sk-check{transform:none}
+.tag{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:5px 11px;border-radius:999px;border:1px solid var(--line2);color:var(--white)}
+[dir=rtl] .tag{letter-spacing:0;text-transform:none;font-size:13px}
+.tag svg{width:13px;height:13px;color:var(--teal)}
+.ev{margin:0;padding-inline-start:16px;border-inline-start:2px solid var(--teal-b);color:var(--t2);font-size:15px;line-height:1.65}
+[dir=rtl] .ev{line-height:1.9}
+.ev mark{background:rgba(25,230,193,.18);color:var(--white);border-radius:4px;padding:0 3px}
+.conf{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--t3)}
+.conf .pips{display:inline-flex;gap:3px}
+.conf .pips i{width:6px;height:14px;border-radius:2px;background:var(--line2)}
+.conf .pips i.on{background:var(--teal)}
+.sk-act{display:flex;gap:8px;margin-top:auto;flex-wrap:wrap}
+.dock{position:sticky;bottom:18px;z-index:20;margin-top:36px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px;padding-inline-start:22px;background:rgba(7,26,47,.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--line2);border-radius:999px;box-shadow:0 20px 50px -20px rgba(0,0,0,.8)}
+.dock .grow{flex:1;min-width:120px;font-size:14px;color:var(--t2)}
+.dock .grow b{color:var(--white);font-family:var(--num)}
+@media (max-width:640px){.dock{border-radius:24px;padding:14px}.dock .btn{flex:1 1 100%}}
+
+/* ---------- Opportunities ---------- */
+.opps{display:grid;gap:18px;margin-top:48px}
+@media (min-width:920px){.opps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.opp{position:relative;display:flex;flex-direction:column;gap:20px;padding:28px;border-radius:28px;background:var(--navy);border:1px solid var(--line);transition:border-color .35s,transform .5s var(--ease),box-shadow .4s;transform:perspective(1100px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));animation:chipIn .65s var(--ease) both;animation-delay:calc(var(--i) * 80ms)}
+.opp:hover{border-color:var(--amber-b);box-shadow:0 30px 70px -40px rgba(255,181,71,.45)}
+.opp.is-target{border-color:var(--amber);box-shadow:inset 0 0 0 1px var(--amber)}
+.opp-top{display:flex;gap:16px;align-items:flex-start}
+.org{width:52px;height:52px;flex:none;border-radius:16px;display:grid;place-items:center;font-weight:700;font-size:15px;letter-spacing:.02em;background:var(--amber-a);color:var(--amber);border:1px solid var(--amber-b)}
+.opp-h{flex:1;min-width:0}
+.opp-h p{font-size:14px;color:var(--t3)}
+.opp h3{margin:4px 0 0;font-size:clamp(20px,1.8vw,26px);font-weight:600;letter-spacing:-.02em;line-height:1.2}
+[dir=rtl] .opp h3{letter-spacing:0;line-height:1.45}
+.why{color:var(--t2);font-size:15px}
+.mini{display:flex;flex-wrap:wrap;gap:6px}
+.mini span{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:5px 11px;border-radius:999px}
+.mini .h{background:var(--teal-a);color:var(--white);border:1px solid var(--teal-b)}
+.mini .g{border:1px dashed var(--line2);color:var(--t2)}
+.mini svg{width:12px;height:12px}
+.opp-foot{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:auto;padding-top:18px;border-top:1px solid var(--line)}
+.pay{color:var(--amber);font-weight:600;font-family:var(--num)}
+.otype{font-size:13px;color:var(--t3)}
+.opp-foot .btn{margin-inline-start:auto}
+.ring{position:relative;width:var(--s);height:var(--s);flex:none}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+[dir=rtl] .ring svg{transform:rotate(-90deg) scaleY(-1)}
+.ring .trk{fill:none;stroke:var(--line2)}
+.ring .val{fill:none;stroke:var(--teal);stroke-linecap:round;transition:stroke-dashoffset 1.4s var(--ease)}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--num);font-weight:600;font-size:calc(var(--s) * .25);letter-spacing:-.02em}
+
+/* ---------- Gap ---------- */
+.gap-head{display:grid;gap:36px;align-items:center}
+@media (min-width:960px){.gap-head{grid-template-columns:minmax(0,1fr) auto}}
+.gap-ring{display:grid;justify-items:center;gap:10px;text-align:center;color:var(--t3);font-size:14px}
+.ladder{display:flex;gap:6px;margin-top:56px;height:64px}
+.seg{position:relative;border-radius:14px;border:1.5px dashed var(--line2);overflow:hidden;min-width:0}
+.seg.have{border:0;background:var(--teal-a)}
+.seg.have::after{content:"";position:absolute;inset:0;background:var(--teal);transform:scaleX(0);transform-origin:var(--origin);animation:line .8s var(--ease) forwards;animation-delay:calc(var(--i) * 110ms + 200ms)}
+.seg span{position:absolute;z-index:1;inset-inline:12px;bottom:10px;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--t2)}
+.seg.have span{color:var(--void);opacity:0;animation:fadeIn .4s ease forwards;animation-delay:calc(var(--i) * 110ms + 600ms)}
+.seg.core span::before{content:"★ "}
+@media (max-width:700px){.seg span{display:none}.ladder{height:40px}}
+.gap-cols{display:grid;gap:18px;margin-top:28px}
+@media (min-width:820px){.gap-cols{grid-template-columns:1fr 1fr}}
+.gap-cols h2{margin:0 0 14px;font-size:13px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--t3)}
+[dir=rtl] .gap-cols h2{letter-spacing:0;font-size:15px;text-transform:none}
+.glist{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.glist li{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:18px;border:1px solid var(--line)}
+.glist .mk{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;flex:none}
+.glist .mk svg{width:15px;height:15px}
+.glist .h .mk{background:var(--teal);color:var(--void)}
+.glist .g{border-style:dashed;border-color:var(--line2)}
+.glist .g .mk{border:1.5px dashed var(--line2);color:var(--t2)}
+.glist .nm{flex:1;font-weight:500}
+.glist .key{font-size:12px;color:var(--t3)}
+
+/* ---------- Plan ---------- */
+.plan-grid{display:grid;gap:28px;margin-top:48px;align-items:start}
+@media (min-width:1080px){.plan-grid{grid-template-columns:minmax(0,1fr) 330px}.plan-aside{position:sticky;top:96px;order:2}}
+.plan-aside{display:grid;gap:18px}
+.r-num{display:flex;align-items:baseline;gap:6px;font-family:var(--num);font-size:88px;font-weight:600;line-height:.9;letter-spacing:-.05em;color:var(--teal)}
+.r-num small{font-size:28px;color:var(--t2)}
+.r-bar{height:10px;border-radius:10px;background:var(--line2);overflow:hidden;margin-top:18px}
+.r-bar i{display:block;height:100%;background:var(--teal);border-radius:10px;transition:width 1.1s var(--ease)}
+.r-meta{display:flex;justify-content:space-between;gap:10px;margin-top:14px;font-size:14px;color:var(--t2);flex-wrap:wrap}
+.r-meta b{color:var(--white);font-family:var(--num);font-weight:600}
+.week{padding:clamp(20px,2.6vw,30px)}
+.week+.week{margin-top:16px}
+.week h2{margin:0 0 6px;font-size:13px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--teal)}
+[dir=rtl] .week h2{letter-spacing:0;font-size:15px;text-transform:none}
+.steps{list-style:none;margin:0;padding:0}
+.step{display:grid;grid-template-columns:44px minmax(0,1fr);gap:16px;padding:18px 0;border-top:1px solid var(--line)}
+.step:first-child{border-top:0}
+.tick{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--line2);background:none;display:grid;place-items:center;color:transparent;transition:all .35s var(--spring)}
+.tick svg{width:18px;height:18px}
+.tick:hover{border-color:var(--teal);color:var(--teal-b)}
+.k-prove .tick,.k-project .tick{border-style:dashed;border-color:var(--teal)}
+.done .tick{background:var(--teal);border-style:solid;border-color:var(--teal);color:var(--void);animation:press .5s var(--spring)}
+.step-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3)}
+[dir=rtl] .step-meta{letter-spacing:0;text-transform:none;font-size:13px}
+.step-meta svg{width:14px;height:14px}
+.k-prove .step-meta,.k-project .step-meta{color:var(--teal)}
+.step-t{margin-top:6px;font-size:16px;line-height:1.55;transition:color .3s}
+.done .step-t{color:var(--t3);text-decoration:line-through;text-decoration-color:var(--line2)}
+.k-prove.done .step-t,.k-project.done .step-t{text-decoration:none;color:var(--white)}
+.prove-note{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:13px;color:var(--teal)}
+.prove-note svg{width:14px;height:14px}
+.step .btn{margin-top:12px}
+.pt{position:fixed;z-index:95;width:7px;height:7px;border-radius:50%;background:var(--teal);pointer-events:none;animation:pt .9s var(--ease) forwards}
+@keyframes pt{to{transform:translate(var(--x),var(--y)) scale(.2);opacity:0}}
+
+/* ---------- Interview ---------- */
+.chat{display:grid;gap:18px;margin-top:44px}
+.bub{max-width:min(640px,92%);padding:18px 20px;border-radius:22px;font-size:17px;line-height:1.6;animation:chipIn .5s var(--ease) both}
+[dir=rtl] .bub{line-height:1.85}
+.bub.rec{background:var(--navy);border:1px solid var(--line2);border-start-start-radius:6px}
+.bub.you{justify-self:end;background:var(--teal-a);border:1px solid var(--teal-b);border-start-end-radius:6px;white-space:pre-wrap}
+.who{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px;color:var(--t3)}
+.who .av{width:28px;height:28px;border-radius:50%;background:var(--void);border:1px solid var(--teal-b);display:grid;place-items:center;color:var(--teal)}
+.who .av svg{width:18px;height:18px}
+.dots{display:inline-flex;gap:5px;padding:6px 0}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--t2);animation:blink 1.2s infinite both}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes blink{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-4px)}}
+.fb{display:grid;gap:14px;padding:20px;border-radius:22px;border:1px solid var(--line);background:rgba(7,26,47,.6);max-width:640px;animation:chipIn .55s var(--ease) both}
+.fb-top{display:flex;align-items:baseline;gap:6px}
+.fb-top b{font-family:var(--num);font-size:44px;font-weight:600;letter-spacing:-.04em;color:var(--teal);line-height:1}
+.fb-top span{color:var(--t3)}
+.fb-row{display:grid;grid-template-columns:90px minmax(0,1fr) 34px;gap:12px;align-items:center;font-size:14px;color:var(--t2)}
+.fb-row .bar{height:6px;border-radius:6px;background:var(--line2);overflow:hidden}
+.fb-row .bar i{display:block;height:100%;width:var(--w);background:var(--teal);border-radius:6px}
+.fb.anim .bar i{animation:grow 1.1s var(--ease) both}
+@keyframes grow{from{width:0}}
+.fb-row b{text-align:end;font-family:var(--num);color:var(--white)}
+.fb-tip{display:flex;gap:8px;align-items:flex-start;font-size:15px}
+.fb-tip svg{width:16px;height:16px;flex:none;margin-top:4px;color:var(--teal)}
+.composer{margin-top:24px;display:grid;gap:12px}
+.composer .textarea{min-height:140px}
+.composer .row{justify-content:space-between}
+
+/* ---------- Ready ---------- */
+.ready-hero{text-align:center;display:grid;justify-items:center}
+.big{display:flex;align-items:baseline;justify-content:center;font-family:var(--num);font-weight:600;font-size:clamp(120px,22vw,280px);line-height:.85;letter-spacing:-.06em;color:var(--teal);text-shadow:0 30px 120px rgba(25,230,193,.35)}
+.big small{font-size:.32em;color:var(--t2);letter-spacing:0;margin-inline-start:.06em}
+.ready-hero .h1{margin-top:28px;max-width:20ch}
+.ready-hero .sub{margin-inline:auto}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:56px}
+.stats div{padding:22px;border-radius:22px;border:1px solid var(--line);background:var(--navy)}
+.stats b{display:block;font-family:var(--num);font-size:clamp(32px,4vw,48px);font-weight:600;letter-spacing:-.03em;line-height:1}
+.stats span{display:block;margin-top:8px;font-size:14px;color:var(--t3)}
+@media (max-width:560px){.stats{grid-template-columns:1fr}}
+.final{margin-top:18px}
+.impact{display:flex;align-items:center;gap:28px;flex-wrap:wrap;margin-top:18px;padding:26px;border-radius:28px;border:1px solid var(--line)}
+.impact p{flex:1;min-width:240px;color:var(--t2);font-size:16px}
+.tenone{display:flex;align-items:center;gap:7px}
+.tenone i{width:11px;height:11px;border-radius:50%;background:var(--white);opacity:0;animation:pop2 .45s var(--spring) forwards;animation-delay:calc(var(--i) * 70ms + 400ms)}
+.tenone .arr{width:28px;height:1.5px;background:var(--line2);border-radius:0;margin:0 6px;opacity:1;animation:none}
+.tenone .one{width:20px;height:20px;background:var(--teal);box-shadow:0 0 0 6px var(--teal-a);animation-delay:1.3s}
+@keyframes pop2{from{opacity:0;transform:scale(0)}to{opacity:1;transform:none}}
+
+/* ---------- Toasts ---------- */
+.toasts{position:fixed;z-index:90;inset-inline:0;bottom:24px;display:grid;justify-items:center;gap:8px;pointer-events:none;padding:0 16px}
+.toast{display:flex;align-items:center;gap:10px;max-width:560px;padding:13px 18px;border-radius:16px;background:var(--white);color:var(--void);font-size:15px;font-weight:500;box-shadow:0 20px 50px -20px rgba(0,0,0,.9);animation:tIn .5s var(--spring) both}
+.toast svg{width:18px;height:18px;flex:none;color:var(--void)}
+.toast.out{animation:tOut .3s ease forwards}
+@keyframes tIn{from{opacity:0;transform:translateY(20px) scale(.95)}}
+@keyframes tOut{to{opacity:0;transform:translateY(10px)}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:1ms!important;animation-delay:0ms!important;animation-iteration-count:1!important;transition-duration:1ms!important}
+  .needle{transition:none}
+}
+</style>
+</head>
+<body data-screen="welcome">
+<noscript><p style="padding:24px">BAWSALA needs JavaScript to run.</p></noscript>
+<p class="proto" id="proto"></p>
+<header class="top">
+  <button class="logo" data-act="home" id="logo"></button>
+  <nav class="spine" id="spine"></nav>
+  <div class="tools"><div class="langs" id="langs" role="group"></div><button class="iconbtn" id="reset" data-act="reset"></button></div>
+</header>
+<div class="mprog" id="mprog"></div>
+<main id="main"></main>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+(() => {
+"use strict";
+
+/* =====================================================================
+   1. Content — skills, signals, roles, learning paths
+   ===================================================================== */
+const SK = {
+  customer_service:{en:"Customer service",fr:"Service client",ar:"خدمة الزبناء"},
+  sales:{en:"Sales",fr:"Vente",ar:"البيع"},
+  negotiation:{en:"Negotiation",fr:"Négociation",ar:"التفاوض"},
+  cash:{en:"Cash & budget handling",fr:"Gestion de caisse",ar:"تدبير الصندوق والمال"},
+  inventory:{en:"Inventory management",fr:"Gestion de stock",ar:"تدبير المخزون"},
+  social_media:{en:"Social media",fr:"Réseaux sociaux",ar:"تدبير شبكات التواصل"},
+  content:{en:"Content creation",fr:"Création de contenu",ar:"صناعة المحتوى"},
+  teamwork:{en:"Teamwork",fr:"Travail d'équipe",ar:"العمل الجماعي"},
+  leadership:{en:"Leading a team",fr:"Coordination d'équipe",ar:"قيادة فريق"},
+  event:{en:"Event planning",fr:"Organisation d'événements",ar:"تنظيم الفعاليات"},
+  research:{en:"Research",fr:"Recherche & études",ar:"البحث وجمع المعطيات"},
+  presentation:{en:"Presenting",fr:"Prise de parole",ar:"العرض الشفهي"},
+  problem_solving:{en:"Problem solving",fr:"Résolution de problèmes",ar:"حل المشكلات"},
+  multilingual:{en:"Multilingual communication",fr:"Communication multilingue",ar:"التواصل بعدة لغات"},
+  excel:{en:"Excel & data",fr:"Excel & analyse",ar:"Excel وتحليل المعطيات"},
+  crm:{en:"CRM tools",fr:"Outils CRM",ar:"أدوات CRM"},
+  b2b:{en:"B2B sales",fr:"Vente B2B",ar:"البيع للشركات"},
+  powerbi:{en:"Power BI",fr:"Power BI",ar:"Power BI"},
+  sql:{en:"SQL",fr:"SQL",ar:"SQL"},
+  ads:{en:"Paid social ads",fr:"Publicité en ligne",ar:"الإعلانات الممولة"}
+};
+/* Skills that almost never make it onto a CV, yet employers hire for. */
+const RARE = new Set(["negotiation","cash","inventory","leadership","event"]);
+/* Transparent rules: a skill is only named when the person's own words contain a signal for it. */
+const HINT = {
+  customer_service:/customer|client|زبون|زبناء|زبائن/i,
+  sales:/\bsales?\b|\bsell|\bsold\b|vente|vend[su]|بيع|بعت|مبيعات/i,
+  negotiation:/negotiat|négoci|supplier|fournisseur|تفاوض|مورد/i,
+  cash:/cash|\btill\b|caisse|budget|argent|money|صندوق|ميزانية|المال/i,
+  inventory:/stock|inventor|مخزون/i,
+  social_media:/instagram|facebook|tiktok|linkedin|social media|réseaux sociaux|إنستغرام|انستغرام|فيسبوك|تيك ?توك/i,
+  content:/photo|vid[eé]o|\bcontent|contenu|canva|\bdesign|صور|فيديو|محتوى|تصميم/i,
+  teamwork:/\bteam|équipe|volunteer|bénévol|فريق|متطوع/i,
+  leadership:/coordinat|coordonn|\bled\b|\blead|organi[sz]ed|managed|نسقت|قدت|أشرفت/i,
+  event:/\bevent|événement|campaign|campagne|حملة|فعالية|تظاهرة/i,
+  research:/survey|questionnaire|market study|étude de marché|research|recherche|دراسة سوق|استمارة/i,
+  presentation:/present|présent|jury|pitch|soutenance|قدمت|لجنة/i,
+  problem_solving:/problem|problème|\bsolv|résolu|مشكل|حلول|حللت/i,
+  multilingual:/french|english|spanish|français|anglais|espagnol|الفرنسية|الإنجليزية|الإسبانية/i,
+  excel:/excel|spreadsheet|tableur|pivot|إكسل|اكسل/i,
+  crm:/\bcrm|hubspot|salesforce/i,
+  b2b:/b2b|companies|entreprises|شركات|مقاولات/i,
+  powerbi:/power ?bi|dashboard|tableau de bord|لوحة قيادة/i,
+  sql:/\bsql|requête|quer(y|ies)|استعلام/i,
+  ads:/\bads?\b|publicité|sponsoris|إعلان/i
+};
+/* What the kind of experience usually implies — offered as "check it", never asserted. */
+const TYPE_SKILLS = { family:["customer_service","problem_solving"], club:["teamwork","event"], side:["sales","problem_solving"], studies:["research","presentation"] };
+
+const OPPS = [
+  { id:"bizdev", org:"Sahm B2B", ini:"SB", type:"job", pay:"7 000 – 9 000 MAD",
+    city:{en:"Casablanca",fr:"Casablanca",ar:"الدار البيضاء"},
+    title:{en:"Business Development Associate",fr:"Chargé(e) de développement commercial",ar:"مساعد(ة) تطوير الأعمال"},
+    req:[["sales",1],["negotiation",1],["crm",1],["customer_service",0],["b2b",0],["excel",0],["presentation",0]],
+    project:{en:"Build a mini sales pipeline: 15 Tangier businesses qualified in free HubSpot, with a 5-line pitch for the top 3.",fr:"Construire un mini pipeline : 15 entreprises de Tanger qualifiées dans HubSpot gratuit, avec un pitch de 5 lignes pour les 3 meilleures.",ar:"ابنِ مسار بيع صغيراً: 15 مقاولة في طنجة مصنّفة في HubSpot المجاني، مع عرض من 5 أسطر لأهم 3 منها."} },
+  { id:"retail", org:"Qantara Retail", ini:"QR", type:"job", pay:"6 000 – 7 500 MAD",
+    city:{en:"Tangier",fr:"Tanger",ar:"طنجة"},
+    title:{en:"Retail Sales Supervisor",fr:"Superviseur(e) des ventes",ar:"مشرف(ة) مبيعات في متجر"},
+    req:[["sales",1],["customer_service",1],["inventory",1],["leadership",0],["cash",0],["excel",0]],
+    project:{en:"Visit two Tangier shops and write 5 concrete improvements to stock layout and customer welcome.",fr:"Visiter deux magasins à Tanger et rédiger 5 améliorations concrètes du stock et de l'accueil.",ar:"زر متجرين في طنجة واكتب 5 تحسينات عملية لترتيب المخزون واستقبال الزبناء."} },
+  { id:"marketing", org:"Pixel Atlas", ini:"PA", type:"intern", pay:"3 000 MAD",
+    city:{en:"Casablanca",fr:"Casablanca",ar:"الدار البيضاء"},
+    title:{en:"Digital Marketing Intern",fr:"Stagiaire marketing digital",ar:"متدرب(ة) في التسويق الرقمي"},
+    req:[["social_media",1],["content",1],["ads",1],["excel",0],["presentation",0]],
+    project:{en:"Run a 100 MAD ad for a local shop and report reach, clicks and cost on one page.",fr:"Lancer une publicité de 100 MAD pour un commerce local et résumer portée, clics et coût sur une page.",ar:"أطلق إعلاناً بـ100 درهم لمحل في حيك، ولخّص الوصول والنقرات والكلفة في صفحة واحدة."} },
+  { id:"analyst", org:"Dataverse Maroc", ini:"DM", type:"intern", pay:"2 500 MAD",
+    city:{en:"Rabat",fr:"Rabat",ar:"الرباط"},
+    title:{en:"Junior Business Analyst",fr:"Business analyst junior",ar:"محلل(ة) أعمال مبتدئ(ة)"},
+    req:[["excel",1],["powerbi",1],["sql",1],["research",0],["presentation",0],["problem_solving",0]],
+    project:{en:"Build a 3-chart Power BI dashboard from open HCP data, with one insight per chart.",fr:"Construire un tableau de bord Power BI de 3 graphiques à partir des données ouvertes du HCP, avec un enseignement par graphique.",ar:"ابنِ لوحة Power BI من 3 رسوم انطلاقاً من معطيات المندوبية السامية للتخطيط، مع خلاصة لكل رسم."} }
+];
+
+const LEARN = {
+  crm:{h:6, learn:{en:"HubSpot Academy — the free “CRM Basics” course",fr:"HubSpot Academy — le cours gratuit « Bases du CRM »",ar:"أكاديمية HubSpot — دورة «أساسيات CRM» المجانية"},
+    practice:{en:"Log 10 real prospects in HubSpot with their deal stage",fr:"Saisir 10 vrais prospects dans HubSpot avec leur étape",ar:"أدخل 10 زبناء محتملين حقيقيين في HubSpot مع مرحلة كل واحد"},
+    prove:{en:"A HubSpot pipeline with 10 qualified prospects",fr:"Un pipeline HubSpot de 10 prospects qualifiés",ar:"مسار بيع في HubSpot يضم 10 زبناء محتملين مصنّفين"}},
+  b2b:{h:5, learn:{en:"LinkedIn Learning — the selling-to-businesses module",fr:"LinkedIn Learning — le module vente B2B",ar:"LinkedIn Learning — وحدة البيع للشركات"},
+    practice:{en:"Pitch 2 real businesses by phone and note their objections",fr:"Présenter l'offre à 2 vraies entreprises par téléphone et noter les objections",ar:"قدّم عرضاً هاتفياً لمقاولتين حقيقيتين ودوّن اعتراضاتهما"},
+    prove:{en:"Notes from 2 real B2B calls, with how each objection was handled",fr:"Les notes de 2 vrais appels B2B, avec le traitement de chaque objection",ar:"ملاحظات مكالمتين حقيقيتين مع الشركات، وكيف عالجت كل اعتراض"}},
+  excel:{h:4, learn:{en:"Microsoft's free Excel training: PivotTables and XLOOKUP",fr:"La formation Excel gratuite de Microsoft : tableaux croisés et RECHERCHEX",ar:"تكوين Microsoft المجاني في Excel: الجداول المحورية وXLOOKUP"},
+    practice:{en:"Turn a month of real sales into a PivotTable",fr:"Transformer un mois de vraies ventes en tableau croisé",ar:"حوّل مبيعات شهر حقيقي إلى جدول محوري"},
+    prove:{en:"A PivotTable and chart built from real numbers",fr:"Un tableau croisé et un graphique construits avec de vrais chiffres",ar:"جدول محوري ورسم بياني من أرقام حقيقية"}},
+  powerbi:{h:6, learn:{en:"Microsoft Learn — “Get started with Power BI”",fr:"Microsoft Learn — « Bien démarrer avec Power BI »",ar:"Microsoft Learn — «ابدأ مع Power BI»"},
+    practice:{en:"Import a real sales file and build two visuals",fr:"Importer un vrai fichier de ventes et créer deux visuels",ar:"استورد ملف مبيعات حقيقياً وابنِ رسمين"},
+    prove:{en:"A two-chart dashboard with one insight per chart",fr:"Un tableau de bord de deux graphiques, avec un enseignement chacun",ar:"لوحة من رسمين مع خلاصة لكل رسم"}},
+  sql:{h:6, learn:{en:"SQLBolt — the first six lessons",fr:"SQLBolt — les six premières leçons",ar:"SQLBolt — الدروس الستة الأولى"},
+    practice:{en:"Write 10 queries on a sample sales database",fr:"Écrire 10 requêtes sur une base de ventes d'exemple",ar:"اكتب 10 استعلامات على قاعدة معطيات مبيعات تجريبية"},
+    prove:{en:"A file of 10 working queries, each with the question it answers",fr:"Un fichier de 10 requêtes qui fonctionnent, chacune avec sa question",ar:"ملف من 10 استعلامات تعمل، مع السؤال الذي يجيب عنه كل واحد"}},
+  ads:{h:5, learn:{en:"Meta Blueprint — the free ads fundamentals path",fr:"Meta Blueprint — le parcours gratuit sur les bases de la publicité",ar:"Meta Blueprint — مسار أساسيات الإعلانات المجاني"},
+    practice:{en:"Draft a campaign targeting Tangier in Ads Manager",fr:"Préparer une campagne ciblant Tanger dans le Gestionnaire de publicités",ar:"جهّز حملة تستهدف طنجة في مدير الإعلانات"},
+    prove:{en:"A live 100 MAD campaign and its results on one page",fr:"Une campagne de 100 MAD lancée, et ses résultats sur une page",ar:"حملة حقيقية بـ100 درهم ونتائجها في صفحة واحدة"}}
+};
+
+const EXAMPLE = {
+  en:"Since high school I help at my father's appliance shop in Tangier. I serve customers, close sales, handle the cash register and keep track of stock. I negotiate prices with suppliers. I also launched the shop's Instagram page with photos and videos, and followers went from 900 to 4,200. At university I coordinated 25 volunteers for a Ramadan food campaign and presented a market study to a jury.",
+  fr:"Depuis le lycée, j'aide dans la boutique d'électroménager de mon père à Tanger. Je sers les clients, je conclus des ventes, je tiens la caisse et je suis le stock. Je négocie les prix avec les fournisseurs. J'ai lancé la page Instagram de la boutique avec photos et vidéos : les abonnés sont passés de 900 à 4 200. À l'université, j'ai coordonné 25 bénévoles pour une campagne du Ramadan et présenté une étude de marché devant un jury.",
+  ar:"منذ الثانوية وأنا أساعد أبي في محل الأجهزة المنزلية بطنجة. أخدم الزبناء وأبيع، وأتكلف بالصندوق وأتتبع المخزون. أتفاوض على الأثمنة مع الموردين. أطلقت صفحة إنستغرام للمحل بصور وفيديوهات، فارتفع المتابعون من 900 إلى 4200. وفي الجامعة نسقت 25 متطوعاً في حملة رمضان، وقدمت دراسة سوق أمام لجنة."
+};
+const DEMO_FIELD = {en:"Economics & Management",fr:"Économie et gestion",ar:"الاقتصاد والتدبير"};
+
+/* =====================================================================
+   2. Copy — every user-facing string, in three languages
+   ===================================================================== */
+const I18N = {
+en:{
+  title:"BAWSALA — From potential to opportunity", home:"BAWSALA home",
+  proto:"Prototype · sample data · the AI is simulated with transparent rules, not a live model",
+  reset:"Start over", lang:"Language", back:"Back", cont:"Continue", nav:"Your journey",
+  st:["You","Skills","Opportunities","Gap","30 days","Interview","Ready"], step_of:"Step {a} of {b}",
+  w_kicker:"For students & young graduates in Morocco",
+  w_t1:"Discover what you", w_t2:"can do", w_t3:"— not just what you studied.",
+  w_lede:"Tell BAWSALA what you've actually done. It names your skills, shows where they fit, and builds a 30-day path to a real opportunity.",
+  w_start:"Start — it's free", w_demo:"Watch Yassir's journey",
+  w_loop:["Skills","Opportunities","Gaps","Action","Readiness"],
+  p_kicker:"01 · You", p_title:"First, who are you?", p_sub:"Four answers. Nothing here is public.",
+  p_name:"First name", p_name_ph:"e.g. Salma", p_err_name:"Tell us your first name.",
+  p_stage:"Where are you now?", stages:{student:"Student",final:"Final year",grad:"Recent graduate",seeker:"Looking for work"},
+  p_field:"Field of study", p_field_ph:"e.g. Economics & Management",
+  p_langs:"Languages you can work in", p_langs_hint:"Three or more is a skill on its own.",
+  langs:{ar:"Arabic",dar:"Darija",fr:"French",en:"English",es:"Spanish",amz:"Amazigh"},
+  s_kicker:"01 · Your story", s_title:"Now, one thing you've actually done.",
+  s_sub:"Not your diploma. A family shop, a club, a side job, a project — written the way you'd tell a friend.",
+  s_type:"What kind of experience?", types:{family:"Family business",club:"Club or volunteering",side:"Side job or freelance",studies:"Studies or project"},
+  s_label:"What did you actually do there?", s_ph:"e.g. I help at my father's shop after class. I serve customers, handle the till…",
+  s_example:"Use Yassir's story", s_go:"Find my skills",
+  s_err:"Write at least two real sentences — BAWSALA only names what your words prove.",
+  det:{thin:["Too thin to prove anything yet.","Add what you did, for whom, and one number."],ok:["Enough to start.","The more specific you are, the stronger each proof."],rich:["Plenty to work with.","Real detail — expect several skills, each with its proof."]},
+  s_hint:"Numbers help: customers served, people coordinated, followers gained.",
+  a_kicker:"02 · Analysis", a_title:"Reading what you did.",
+  a_stages:["Reading your words","Linking actions to skills","Spotting skills CVs miss","Preparing the proof"],
+  a_found:"Found so far", a_note:"Prototype: skills are inferred with transparent rules from your own words — no hidden model.",
+  pp_kicker:"02 · Skill Passport", pp_title:"{N} hiding in what you did.",
+  pp_sub:"Each one carries the sentence that proves it. Keep what describes you — nothing is added without you.",
+  pp_id:"SKILL PASSPORT", pp_rare:"Rarely on a CV", pp_of:"of {b} confirmed",
+  pp_conf_high:"From your own words", pp_conf_med:"From the kind of experience — check it", pp_conf_lang:"From the languages you work in", pp_conf_plan:"Proved in your plan",
+  ev_type:"People who help in a “{type}” usually do this. Confirm only if it's true for you.", ev_lang:"You work in {list}.",
+  pp_yes:"That's me", pp_no:"Not really", pp_restore:"Restore", pp_all:"Confirm all",
+  pp_count:"<b>{a}</b> of {b} confirmed", pp_go:"See where they fit",
+  pp_empty_t:"Not enough to read yet.", pp_empty_d:"Add what you actually did — BAWSALA won't invent skills.", pp_empty_cta:"Back to my story",
+  m_kicker:"03 · Opportunities", m_title:"Where you already fit.",
+  m_sub:"Real roles in Morocco, ranked by how much you already cover. Pick one to aim at.",
+  m_cover:"You show {a} of {b} skills", m_why:"Your {skills} already cover the core of this role.", m_why_low:"A stretch — but your plan would show exactly where to start.",
+  m_pick:"Aim for this", m_aim:"Your target", otypes:{job:"Job",intern:"Internship"},
+  g_kicker:"04 · Skill gap", g_title0:"Nothing is missing.", g_title:"You're {N} away.",
+  g_sub:"{role} · {org}. Exactly what you have, and exactly what to build.",
+  g_have:"You have", g_build:"To build", g_key:"Key skill · counts double", g_ready:"ready for this role",
+  g_go:"Build my 30-day plan", g_change:"Choose another role",
+  r_kicker:"05 · 30-day roadmap", r_title:"From {a}% to ready, one proof at a time.",
+  r_sub:"Learn, practise, then produce something real. Only proof moves your readiness.",
+  r_week:"Week {n}", r_day:"Day {a}", r_days:"Days {a}–{b}",
+  kinds:{learn:"Learn",practice:"Practise",prove:"Prove",project:"Mini-project",interview:"Interview",apply:"Apply"},
+  r_prove_note:"Adds proof to your passport", r_toast:"{x} proved · readiness {a}% → {b}%",
+  r_steps:"<b>{a}</b> of {b} steps", r_start:"Started at <b>{a}%</b>", r_go:"Practise the interview", r_readiness:"Readiness for {role}",
+  r_open:"Start the interview", r_see:"See my readiness", r_hours:"≈ {n} h",
+  gen_learn:"Take a free beginner course on {x} and finish the first module", gen_practice:"Use {x} once in a real task this week", gen_prove:"A one-page write-up of how you used {x}, with the result",
+  st_interview:"Mock interview with BAWSALA's AI recruiter", st_apply:"Apply to {org} with your passport",
+  i_kicker:"06 · AI mock interview", i_title:"Practise before it counts.",
+  i_sub:"A recruiter for {role} asks three questions. Honest feedback on each answer.",
+  i_q:"Question {a} of {b}", i_ph:"Type your answer…", i_suggest:"Draft from my passport", i_send:"Answer",
+  i_typing:"Recruiter is typing", i_you:"You", i_rec:"Recruiter · {org}", i_ans:"Your answer",
+  i_scores:{clarity:"Clarity",evidence:"Evidence",relevance:"Relevance"},
+  i_tip_short:"Go a little longer: the situation, what you did, the result.", i_tip_num:"Add one number — it turns a claim into proof.",
+  i_tip_rel:"Name a skill this role asks for, in your own words.", i_tip_good:"Strong answer: concrete, measurable and on target.",
+  i_next:"Next question", i_finish:"See my readiness", i_err:"Write an answer first — or draft one from your passport.",
+  q:["Tell me about yourself — why {role}?","Describe a time you convinced someone who disagreed with you.","This role needs {gap}. How would you get up to speed in your first month?"],
+  sug:["I'm {name}. {e1} {e2} {role} is the natural next step: it runs on {skills}, which I already use every week.","{e} Once, a supplier refused to lower his price. I listened first, then proposed a bigger order spread over three months. We agreed on 6% less, and he still works with us today.","Exactly like my 30-day plan: {learn}, then {practice}. I've already done it once — {prove}. In my first month I'd ask a colleague to review my work every Friday."],
+  y_kicker:"07 · Ready", y_title_hi:"You're ready for {role}.", y_title_lo:"You're getting close.",
+  y_sub_hi:"Not because anyone said so — because your passport now proves it.", y_sub_lo:"Finish the proof steps in your plan; each one moves this number.",
+  y_readiness:"readiness", y_skills:"confirmed skills", y_proofs:"proofs produced", y_interview:"interview score",
+  y_apply:"Apply with my passport", y_applied:"Application sent to {org} with your passport (simulated).", y_applied_btn:"Applied",
+  y_impact:"For every 10 students who pay, 1 student in a remote area gets BAWSALA free.",
+  y_passport:"View my passport", y_plan:"Back to my plan", toast_reset:"Starting over",
+  skills_n:n=>n===1?"1 skill":`${n} skills`
+},
+fr:{
+  title:"BAWSALA — Du potentiel à l'opportunité", home:"Accueil BAWSALA",
+  proto:"Prototype · données d'exemple · l'IA est simulée par des règles transparentes, sans modèle en direct",
+  reset:"Recommencer", lang:"Langue", back:"Retour", cont:"Continuer", nav:"Votre parcours",
+  st:["Vous","Compétences","Opportunités","Écart","30 jours","Entretien","Prêt"], step_of:"Étape {a} sur {b}",
+  w_kicker:"Pour les étudiants et jeunes diplômés au Maroc",
+  w_t1:"Découvrez ce que vous", w_t2:"savez faire", w_t3:"— pas seulement ce que vous avez étudié.",
+  w_lede:"Racontez à BAWSALA ce que vous avez vraiment fait. Il nomme vos compétences, montre où elles comptent et construit un parcours de 30 jours vers une vraie opportunité.",
+  w_start:"Commencer — c'est gratuit", w_demo:"Voir le parcours de Yassir",
+  w_loop:["Compétences","Opportunités","Écarts","Action","Préparation"],
+  p_kicker:"01 · Vous", p_title:"D'abord, qui êtes-vous ?", p_sub:"Quatre réponses. Rien n'est public.",
+  p_name:"Prénom", p_name_ph:"ex. Salma", p_err_name:"Indiquez votre prénom.",
+  p_stage:"Où en êtes-vous ?", stages:{student:"Étudiant(e)",final:"Dernière année",grad:"Jeune diplômé(e)",seeker:"En recherche d'emploi"},
+  p_field:"Filière", p_field_ph:"ex. Économie et gestion",
+  p_langs:"Langues de travail", p_langs_hint:"À partir de trois, c'est une compétence à part entière.",
+  langs:{ar:"Arabe",dar:"Darija",fr:"Français",en:"Anglais",es:"Espagnol",amz:"Amazigh"},
+  s_kicker:"01 · Votre histoire", s_title:"Maintenant, une chose que vous avez vraiment faite.",
+  s_sub:"Pas votre diplôme. Un commerce familial, un club, un petit boulot, un projet — raconté comme à un ami.",
+  s_type:"Quel type d'expérience ?", types:{family:"Commerce familial",club:"Club ou bénévolat",side:"Petit boulot ou freelance",studies:"Études ou projet"},
+  s_label:"Qu'avez-vous concrètement fait ?", s_ph:"ex. J'aide dans la boutique de mon père après les cours. Je sers les clients, je tiens la caisse…",
+  s_example:"Utiliser l'histoire de Yassir", s_go:"Trouver mes compétences",
+  s_err:"Écrivez au moins deux vraies phrases — BAWSALA ne nomme que ce que vos mots prouvent.",
+  det:{thin:["Trop mince pour prouver quoi que ce soit.","Ajoutez ce que vous avez fait, pour qui, et un chiffre."],ok:["De quoi commencer.","Plus vous êtes précis(e), plus chaque preuve est solide."],rich:["Beaucoup de matière.","Du vrai détail — attendez-vous à plusieurs compétences, chacune prouvée."]},
+  s_hint:"Les chiffres aident : clients servis, personnes coordonnées, abonnés gagnés.",
+  a_kicker:"02 · Analyse", a_title:"Lecture de ce que vous avez fait.",
+  a_stages:["Lecture de vos mots","Liens entre actions et compétences","Repérage de ce que les CV oublient","Préparation des preuves"],
+  a_found:"Repérées jusqu'ici", a_note:"Prototype : les compétences sont déduites de vos propres mots par des règles transparentes — aucun modèle caché.",
+  pp_kicker:"02 · Passeport de compétences", pp_title:"{N} cachées dans votre parcours.",
+  pp_sub:"Chacune porte la phrase qui la prouve. Gardez ce qui vous décrit — rien n'est ajouté sans vous.",
+  pp_id:"PASSEPORT DE COMPÉTENCES", pp_rare:"Rarement sur un CV", pp_of:"sur {b} confirmées",
+  pp_conf_high:"Tirée de vos propres mots", pp_conf_med:"Tirée du type d'expérience — à vérifier", pp_conf_lang:"Tirée de vos langues de travail", pp_conf_plan:"Prouvée dans votre plan",
+  ev_type:"Dans un(e) « {type} », on fait généralement cela. Confirmez seulement si c'est vrai pour vous.", ev_lang:"Vous travaillez en {list}.",
+  pp_yes:"C'est moi", pp_no:"Pas vraiment", pp_restore:"Rétablir", pp_all:"Tout confirmer",
+  pp_count:"<b>{a}</b> sur {b} confirmées", pp_go:"Voir où elles comptent",
+  pp_empty_t:"Pas encore assez à lire.", pp_empty_d:"Ajoutez ce que vous avez vraiment fait — BAWSALA n'invente pas de compétences.", pp_empty_cta:"Revenir à mon histoire",
+  m_kicker:"03 · Opportunités", m_title:"Là où vous correspondez déjà.",
+  m_sub:"De vrais postes au Maroc, classés selon ce que vous couvrez déjà. Choisissez-en un à viser.",
+  m_cover:"Vous démontrez {a} compétences sur {b}", m_why:"Vos compétences en {skills} couvrent déjà l'essentiel du poste.", m_why_low:"Plus ambitieux — mais votre plan montrera exactement par où commencer.",
+  m_pick:"Viser ce poste", m_aim:"Votre objectif", otypes:{job:"Emploi",intern:"Stage"},
+  g_kicker:"04 · Écart de compétences", g_title0:"Rien ne manque.", g_title:"Vous êtes à {N} du poste.",
+  g_sub:"{role} · {org}. Ce que vous avez, exactement — et ce qu'il reste à construire.",
+  g_have:"Acquises", g_build:"À construire", g_key:"Compétence clé · compte double", g_ready:"de préparation pour ce poste",
+  g_go:"Construire mon plan de 30 jours", g_change:"Choisir un autre poste",
+  r_kicker:"05 · Parcours de 30 jours", r_title:"De {a} % à prêt, une preuve à la fois.",
+  r_sub:"Apprendre, pratiquer, puis produire quelque chose de réel. Seules les preuves font bouger votre préparation.",
+  r_week:"Semaine {n}", r_day:"Jour {a}", r_days:"Jours {a}–{b}",
+  kinds:{learn:"Apprendre",practice:"Pratiquer",prove:"Prouver",project:"Mini-projet",interview:"Entretien",apply:"Postuler"},
+  r_prove_note:"Ajoute une preuve à votre passeport", r_toast:"{x} prouvée · préparation {a} % → {b} %",
+  r_steps:"<b>{a}</b> étapes sur {b}", r_start:"Départ à <b>{a} %</b>", r_go:"S'entraîner à l'entretien", r_readiness:"Préparation pour {role}",
+  r_open:"Commencer l'entretien", r_see:"Voir ma préparation", r_hours:"≈ {n} h",
+  gen_learn:"Suivez un cours gratuit pour débutants en {x} et terminez le premier module", gen_practice:"Utilisez {x} une fois dans une vraie tâche cette semaine", gen_prove:"Une page qui montre comment vous avez utilisé {x}, avec le résultat",
+  st_interview:"Entretien d'entraînement avec le recruteur IA de BAWSALA", st_apply:"Postuler chez {org} avec votre passeport",
+  i_kicker:"06 · Entretien IA", i_title:"Entraînez-vous avant que ça compte.",
+  i_sub:"Un recruteur pour le poste {role} pose trois questions. Un retour honnête sur chaque réponse.",
+  i_q:"Question {a} sur {b}", i_ph:"Écrivez votre réponse…", i_suggest:"Rédiger depuis mon passeport", i_send:"Répondre",
+  i_typing:"Le recruteur écrit", i_you:"Vous", i_rec:"Recruteur · {org}", i_ans:"Votre réponse",
+  i_scores:{clarity:"Clarté",evidence:"Preuve",relevance:"Pertinence"},
+  i_tip_short:"Développez un peu : la situation, votre action, le résultat.", i_tip_num:"Ajoutez un chiffre — il transforme une affirmation en preuve.",
+  i_tip_rel:"Nommez une compétence que ce poste demande, avec vos mots.", i_tip_good:"Réponse solide : concrète, mesurable et dans le sujet.",
+  i_next:"Question suivante", i_finish:"Voir ma préparation", i_err:"Écrivez une réponse — ou rédigez-la depuis votre passeport.",
+  q:["Parlez-moi de vous — pourquoi le poste de {role} ?","Racontez une fois où vous avez convaincu quelqu'un qui n'était pas d'accord.","Ce poste demande {gap}. Comment monteriez-vous en compétence le premier mois ?"],
+  sug:["Je suis {name}. {e1} {e2} Le poste de {role} est la suite logique : il repose sur {skills}, que je pratique chaque semaine.","{e} Un jour, un fournisseur refusait de baisser son prix. Je l'ai d'abord écouté, puis j'ai proposé une commande plus grosse étalée sur trois mois. Nous avons obtenu 6 % de moins, et il travaille toujours avec nous.","Comme dans mon plan de 30 jours : {learn}, puis {practice}. Je l'ai déjà fait une fois — {prove}. Le premier mois, je demanderais à un collègue de relire mon travail chaque vendredi."],
+  y_kicker:"07 · Prêt", y_title_hi:"Vous êtes prêt(e) pour le poste de {role}.", y_title_lo:"Vous vous rapprochez.",
+  y_sub_hi:"Pas parce qu'on vous l'a dit — parce que votre passeport le prouve désormais.", y_sub_lo:"Terminez les étapes de preuve de votre plan : chacune fait bouger ce chiffre.",
+  y_readiness:"de préparation", y_skills:"compétences confirmées", y_proofs:"preuves produites", y_interview:"score d'entretien",
+  y_apply:"Postuler avec mon passeport", y_applied:"Candidature envoyée à {org} avec votre passeport (simulation).", y_applied_btn:"Candidature envoyée",
+  y_impact:"Pour 10 étudiants qui paient, 1 étudiant d'une région éloignée utilise BAWSALA gratuitement.",
+  y_passport:"Voir mon passeport", y_plan:"Retour à mon plan", toast_reset:"On recommence",
+  skills_n:n=>n===1?"1 compétence":`${n} compétences`
+},
+ar:{
+  title:"بوصلة — من الإمكان إلى الفرصة", home:"الصفحة الرئيسية لبوصلة",
+  proto:"نموذج أولي · بيانات للمثال · الذكاء الاصطناعي هنا محاكاة بقواعد شفافة، لا نموذج حي",
+  reset:"ابدأ من جديد", lang:"اللغة", back:"رجوع", cont:"متابعة", nav:"مسارك",
+  st:["أنت","المهارات","الفرص","الفجوة","30 يوماً","المقابلة","جاهز"], step_of:"الخطوة {a} من {b}",
+  w_kicker:"للطلبة والخريجين الجدد في المغرب",
+  w_t1:"اكتشف ما", w_t2:"تستطيع فعله", w_t3:"— لا ما درسته فقط.",
+  w_lede:"احكِ لبوصلة ما قمت به فعلاً. ستسمّي مهاراتك، وتريك أين تناسبك، وتبني لك مساراً من 30 يوماً نحو فرصة حقيقية.",
+  w_start:"ابدأ مجاناً", w_demo:"شاهد رحلة ياسر",
+  w_loop:["المهارات","الفرص","الفجوات","الفعل","الجاهزية"],
+  p_kicker:"01 · أنت", p_title:"أولاً، من أنت؟", p_sub:"أربعة أجوبة. لا شيء هنا علني.",
+  p_name:"الاسم الشخصي", p_name_ph:"مثال: سلمى", p_err_name:"اكتب اسمك الشخصي.",
+  p_stage:"أين أنت الآن؟", stages:{student:"طالب(ة)",final:"السنة الأخيرة",grad:"خريج(ة) حديث(ة)",seeker:"أبحث عن عمل"},
+  p_field:"التخصص", p_field_ph:"مثال: الاقتصاد والتدبير",
+  p_langs:"اللغات التي تشتغل بها", p_langs_hint:"ثلاث لغات فأكثر مهارة قائمة بذاتها.",
+  langs:{ar:"العربية",dar:"الدارجة",fr:"الفرنسية",en:"الإنجليزية",es:"الإسبانية",amz:"الأمازيغية"},
+  s_kicker:"01 · قصتك", s_title:"والآن، شيء واحد قمت به فعلاً.",
+  s_sub:"ليس شهادتك. محل العائلة، نادٍ، عمل جانبي، مشروع — اكتبه كما تحكيه لصديق.",
+  s_type:"ما نوع هذه التجربة؟", types:{family:"مشروع عائلي",club:"نادٍ أو تطوع",side:"عمل جانبي أو حر",studies:"دراسة أو مشروع"},
+  s_label:"ماذا فعلت هناك بالضبط؟", s_ph:"مثال: أساعد أبي في محله بعد الدراسة. أخدم الزبناء، وأتكلف بالصندوق…",
+  s_example:"استعمل قصة ياسر", s_go:"اكتشف مهاراتي",
+  s_err:"اكتب جملتين حقيقيتين على الأقل — بوصلة لا تسمّي إلا ما تثبته كلماتك.",
+  det:{thin:["قليل جداً لإثبات أي شيء بعد.","أضف ما فعلته، ولمن، ورقماً واحداً."],ok:["يكفي للبداية.","كلما كنت أدق، كان دليل كل مهارة أقوى."],rich:["مادة غنية.","تفاصيل حقيقية — توقّع عدة مهارات، لكل منها دليلها."]},
+  s_hint:"الأرقام تساعد: عدد الزبناء، الأشخاص الذين نسقتهم، المتابعون الجدد.",
+  a_kicker:"02 · التحليل", a_title:"نقرأ ما قمت به.",
+  a_stages:["قراءة كلماتك","ربط الأفعال بالمهارات","رصد ما تغفله السير الذاتية","تجهيز الدليل"],
+  a_found:"ما وجدناه حتى الآن", a_note:"نموذج أولي: تُستنتج المهارات من كلماتك أنت بقواعد شفافة — لا نموذج خفي.",
+  pp_kicker:"02 · جواز المهارات", pp_title:"{N} مخبّأة في ما قمت به.",
+  pp_sub:"كل مهارة تحمل الجملة التي تثبتها. احتفظ بما يصفك — لا يُضاف شيء دون موافقتك.",
+  pp_id:"جواز المهارات", pp_rare:"نادراً ما تُذكر في سيرة ذاتية", pp_of:"من أصل {b} مؤكَّدة",
+  pp_conf_high:"من كلماتك أنت", pp_conf_med:"من نوع التجربة — تحقّق منها", pp_conf_lang:"من اللغات التي تشتغل بها", pp_conf_plan:"أثبتّها في خطتك",
+  ev_type:"من يساعد في «{type}» يقوم بهذا عادةً. أكّدها فقط إن كانت صحيحة بالنسبة لك.", ev_lang:"تشتغل بـ{list}.",
+  pp_yes:"هذا أنا", pp_no:"ليس تماماً", pp_restore:"استرجاع", pp_all:"تأكيد الكل",
+  pp_count:"<b>{a}</b> من {b} مؤكَّدة", pp_go:"أين تناسبني؟",
+  pp_empty_t:"لا يوجد ما يكفي للقراءة بعد.", pp_empty_d:"أضف ما قمت به فعلاً — بوصلة لا تخترع مهارات.", pp_empty_cta:"العودة إلى قصتي",
+  m_kicker:"03 · الفرص", m_title:"أين تناسبك مهاراتك منذ الآن.",
+  m_sub:"وظائف حقيقية في المغرب، مرتّبة حسب ما تغطيه منها. اختر واحدة تستهدفها.",
+  m_cover:"تُظهر {a} من أصل {b} مهارات", m_why:"مهاراتك في {skills} تغطي أساس هذه الوظيفة.", m_why_low:"تحدٍّ أكبر — لكن خطتك ستريك من أين تبدأ بالضبط.",
+  m_pick:"أستهدف هذه", m_aim:"هدفك", otypes:{job:"وظيفة",intern:"تدريب"},
+  g_kicker:"04 · الفجوة", g_title0:"لا ينقصك شيء.", g_title:"تفصلك {N} فقط.",
+  g_sub:"{role} · {org}. ما تملكه بالضبط، وما عليك بناؤه بالضبط.",
+  g_have:"تملكها", g_build:"للبناء", g_key:"مهارة مفتاح · تُحتسب مرتين", g_ready:"جاهزية لهذه الوظيفة",
+  g_go:"ابنِ خطتي لـ30 يوماً", g_change:"اختر وظيفة أخرى",
+  r_kicker:"05 · مسار 30 يوماً", r_title:"من {a}٪ إلى الجاهزية، دليلاً بعد دليل.",
+  r_sub:"تعلّم، تدرّب، ثم أنجز شيئاً حقيقياً. الأدلة وحدها تحرّك جاهزيتك.",
+  r_week:"الأسبوع {n}", r_day:"اليوم {a}", r_days:"الأيام {a}–{b}",
+  kinds:{learn:"تعلّم",practice:"تدرّب",prove:"أثبِت",project:"مشروع صغير",interview:"مقابلة",apply:"ترشّح"},
+  r_prove_note:"يضيف دليلاً إلى جوازك", r_toast:"أثبتّ {x} · الجاهزية {a}٪ ← {b}٪",
+  r_steps:"<b>{a}</b> من {b} خطوات", r_start:"بدأت من <b>{a}٪</b>", r_go:"تدرّب على المقابلة", r_readiness:"الجاهزية لوظيفة {role}",
+  r_open:"ابدأ المقابلة", r_see:"اعرض جاهزيتي", r_hours:"≈ {n} ساعات",
+  gen_learn:"تابع دورة مجانية للمبتدئين في {x} وأكمل الوحدة الأولى", gen_practice:"استعمل {x} مرة في مهمة حقيقية هذا الأسبوع", gen_prove:"صفحة واحدة تشرح كيف استعملت {x}، مع النتيجة",
+  st_interview:"مقابلة تجريبية مع المُشغّل الافتراضي لبوصلة", st_apply:"ترشّح لدى {org} بجوازك",
+  i_kicker:"06 · مقابلة تجريبية بالذكاء الاصطناعي", i_title:"تدرّب قبل أن يُحتسب.",
+  i_sub:"مُشغّل لوظيفة {role} يطرح ثلاثة أسئلة، وتحصل على ملاحظات صريحة عن كل جواب.",
+  i_q:"السؤال {a} من {b}", i_ph:"اكتب جوابك…", i_suggest:"صُغ جواباً من جوازي", i_send:"أجب",
+  i_typing:"المُشغّل يكتب", i_you:"أنت", i_rec:"المُشغّل · {org}", i_ans:"جوابك",
+  i_scores:{clarity:"الوضوح",evidence:"الدليل",relevance:"الملاءمة"},
+  i_tip_short:"أطِل قليلاً: الموقف، ما فعلته، النتيجة.", i_tip_num:"أضف رقماً واحداً — فهو يحوّل الادعاء إلى دليل.",
+  i_tip_rel:"سمِّ مهارة تطلبها هذه الوظيفة، بكلماتك.", i_tip_good:"جواب قوي: ملموس، قابل للقياس، وفي صلب الموضوع.",
+  i_next:"السؤال التالي", i_finish:"اعرض جاهزيتي", i_err:"اكتب جواباً أولاً — أو صُغه من جوازك.",
+  q:["عرّفني بنفسك — لماذا وظيفة {role}؟","احكِ لي عن مرة أقنعت فيها شخصاً لم يكن يوافقك.","هذه الوظيفة تتطلب {gap}. كيف ستتمكن منها في شهرك الأول؟"],
+  sug:["أنا {name}. {e1} {e2} وظيفة {role} هي الخطوة الطبيعية التالية: فهي تقوم على {skills}، وأنا أستعملها كل أسبوع.","{e} ذات مرة رفض أحد الموردين تخفيض ثمنه. أنصتّ إليه أولاً، ثم اقترحت طلبية أكبر موزعة على ثلاثة أشهر. اتفقنا على تخفيض 6٪، وما زال يشتغل معنا إلى اليوم.","تماماً كما في خطتي لـ30 يوماً: {learn}، ثم {practice}. وقد فعلتها مرة من قبل — {prove}. وفي شهري الأول سأطلب من زميل مراجعة عملي كل جمعة."],
+  y_kicker:"07 · جاهز", y_title_hi:"أنت جاهز لوظيفة {role}.", y_title_lo:"أنت تقترب.",
+  y_sub_hi:"ليس لأن أحداً قال ذلك — بل لأن جوازك يثبته الآن.", y_sub_lo:"أكمل خطوات الإثبات في خطتك؛ كل واحدة تحرّك هذا الرقم.",
+  y_readiness:"جاهزية", y_skills:"مهارات مؤكَّدة", y_proofs:"أدلة أنجزتها", y_interview:"نتيجة المقابلة",
+  y_apply:"ترشّح بجوازي", y_applied:"أُرسل ترشيحك إلى {org} مع جوازك (محاكاة).", y_applied_btn:"تم الترشيح",
+  y_impact:"مقابل كل 10 طلبة يدفعون، يستفيد طالب من منطقة نائية من بوصلة مجاناً.",
+  y_passport:"اعرض جوازي", y_plan:"العودة إلى خطتي", toast_reset:"نبدأ من جديد",
+  skills_n:n=>n===1?"مهارة واحدة":n===2?"مهارتان":n<=10?`${n} مهارات`:`${n} مهارة`
+}
+};
+
+/* =====================================================================
+   3. State
+   ===================================================================== */
+const KEY = "bawsala.v3";
+const blank = () => ({ lang:null, screen:"welcome", max:-1,
+  profile:{ name:"", stage:"final", field:"", langs:["ar","fr"] },
+  story:{ type:"family", text:"" }, skills:{}, target:null, planSkills:[], startScore:null,
+  done:{}, iv:{ cur:0, answers:[], scores:[] }, applied:false });
+let S = load();
+function load(){ try{ const d = JSON.parse(localStorage.getItem(KEY)); if(d && typeof d === "object") return Object.assign(blank(), d); }catch(e){} return blank(); }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+const ui = { seenQ:-1, runId:0, autoplay:false };
+
+/* =====================================================================
+   4. Helpers
+   ===================================================================== */
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const RM = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+function detect(){ for(const l of (navigator.languages || [navigator.language || ""])){ const c = String(l).slice(0,2); if(I18N[c]) return c; } return "ar"; }
+const L = () => S.lang || detect();
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = (s, v={}) => String(s).replace(/\{(\w+)\}/g, (m,k) => v[k] !== undefined ? v[k] : m);
+function t(key, v){ const d = I18N[L()]; const s = d[key] !== undefined ? d[key] : I18N.en[key]; return typeof s === "string" && v ? fmt(s, v) : s; }
+const tx = o => o ? (o[L()] || o.en) : "";
+const skName = id => tx(SK[id]);
+const nSkills = n => I18N[L()].skills_n(n);
+function list(a){ a = a.filter(Boolean); if(!a.length) return ""; try{ return new Intl.ListFormat(L()==="ar"?"ar":L(), {style:"long",type:"conjunction"}).format(a); }catch(e){ return a.join(", "); } }
+const opp = id => OPPS.find(o => o.id === id);
+const owned = id => S.skills[id] && S.skills[id].status === "confirmed";
+const confirmedCount = () => Object.values(S.skills).filter(s => s.status === "confirmed").length;
+
+const P = {
+  arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>', back:'<path d="M19 12H5M11 6l-6 6 6 6"/>',
+  check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>', x:'<path d="M6 6l12 12M18 6 6 18"/>',
+  play:'<path d="M8 5.5v13l10.5-6.5z"/>', refresh:'<path d="M20 11a8 8 0 0 0-14.5-4.5L4 8M4 4v4h4M4 13a8 8 0 0 0 14.5 4.5L20 16M20 20v-4h-4"/>',
+  spark:'<path d="M12 3v5M12 16v5M3 12h5M16 12h5M6 6l3 3M15 15l3 3M6 18l3-3M15 9l3-3"/>',
+  book:'<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5zM20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/>',
+  tool:'<path d="M4 20l6-6M14.5 4.5l5 5-7 7-5-5z"/>',
+  file:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>',
+  target:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1"/>',
+  mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+  send:'<path d="M4 12 20 4l-6 16-3-7z"/>', info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+  alert:'<path d="M12 4 2.5 20h19z"/><path d="M12 10v4M12 17h.01"/>', plus:'<path d="M12 5v14M5 12h14"/>',
+  dash:'<path d="M7 12h10"/>'
+};
+const FLIP = new Set(["arrow","back","send"]);
+const ic = n => `<svg class="${FLIP.has(n)?"flip":""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${P[n]||""}</svg>`;
+/* The mark: the Arabic letter ب — a bowl that holds, a dot that points. */
+const mark = (w=2.6) => `<svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path class="bw-bowl" d="M5.5 12.6v1.6a10.5 10.5 0 0 0 21 0v-1.6" stroke-width="${w}"/><circle class="bw-dot" cx="16" cy="6.4" r="2.8"/></svg>`;
+
+function ring(score, size){
+  const r = 26, c = +(2*Math.PI*r).toFixed(2), off = +(c*(1-score/100)).toFixed(2);
+  return `<div class="ring" style="--s:${size}px" role="img" aria-label="${score}%"><svg viewBox="0 0 64 64"><circle class="trk" cx="32" cy="32" r="${r}" stroke-width="5"/><circle class="val" cx="32" cy="32" r="${r}" stroke-width="5" stroke-dasharray="${c}" stroke-dashoffset="${c}" data-off="${off}"/></svg><b><bdi class="num" data-count="${score}">0</bdi></b></div>`;
+}
+function drawRings(root=document){ requestAnimationFrame(() => requestAnimationFrame(() => $$(".ring .val", root).forEach(v => v.style.strokeDashoffset = v.dataset.off))); $$(".ring [data-count]", root).forEach(el => countUp(el, 0, +el.dataset.count, 1300)); }
+function countUp(el, from, to, dur=900, suffix=""){
+  if(!el) return; if(RM() || from === to){ el.textContent = to + suffix; return; }
+  const t0 = performance.now();
+  const f = now => { const k = Math.min(1,(now-t0)/dur), e = 1-Math.pow(1-k,3); el.textContent = Math.round(from+(to-from)*e) + suffix; if(k<1) requestAnimationFrame(f); };
+  requestAnimationFrame(f);
+}
+function toast(msg){
+  const el = document.createElement("div"); el.className = "toast"; el.innerHTML = `${ic("check")}<span>${esc(msg)}</span>`;
+  $("#toasts").append(el); while($("#toasts").children.length > 2) $("#toasts").firstElementChild.remove();
+  setTimeout(() => { el.classList.add("out"); setTimeout(() => el.remove(), 320); }, 3800);
+}
+function burst(from){
+  if(RM() || !from) return; const r = from.getBoundingClientRect(), cx = r.left + r.width/2, cy = r.top + r.height/2;
+  for(let i=0;i<14;i++){ const p = document.createElement("span"); p.className = "pt"; const a = Math.random()*Math.PI*2, d = 40 + Math.random()*70;
+    p.style.cssText = `left:${cx-3}px;top:${cy-3}px;--x:${Math.cos(a)*d}px;--y:${Math.sin(a)*d}px;animation-delay:${Math.random()*80}ms`;
+    document.body.append(p); setTimeout(() => p.remove(), 1100); }
+}
+function typeInto(el, text, done){
+  if(!el) return; if(RM()){ el.value = text; el.dispatchEvent(new Event("input",{bubbles:true})); done && done(); return; }
+  el.value = ""; let i = 0; const step = Math.max(2, Math.round(text.length/90));
+  const tick = () => { if(!document.body.contains(el)) return; i = Math.min(text.length, i+step); el.value = text.slice(0,i); el.scrollTop = el.scrollHeight; el.dispatchEvent(new Event("input",{bubbles:true})); if(i < text.length) setTimeout(tick, 16); else done && done(); };
+  tick();
+}
+
+/* =====================================================================
+   5. Engine — analysis, matching, plan, interview scoring.
+   Deterministic on purpose: every number on screen can be explained.
+   ===================================================================== */
+const sentences = text => text.replace(/([.!?؟])\s+/g, "$1\n").split(/\n+/).map(s => s.trim()).filter(Boolean);
+function analyze(){
+  const out = {}, sents = sentences(S.story.text);
+  for(const [id, re] of Object.entries(HINT)){
+    for(const s of sents){ const m = s.match(re); if(!m) continue;
+      out[id] = out[id] || { id, status:"found", conf:"high", ev:[] };
+      if(out[id].ev.length < 2 && !out[id].ev.some(e => e.text === s)) out[id].ev.push({ src:"words", text:s, hl:m[0] }); }
+  }
+  for(const id of TYPE_SKILLS[S.story.type] || []) if(!out[id]) out[id] = { id, status:"found", conf:"med", ev:[{ src:"type" }] };
+  if(S.profile.langs.length >= 3 && !out.multilingual) out.multilingual = { id:"multilingual", status:"found", conf:"high", ev:[{ src:"lang" }] };
+  return out;
+}
+function merge(found){
+  const prev = S.skills, next = {};
+  for(const [id, f] of Object.entries(found)){ const p = prev[id];
+    next[id] = { ...f, status: p && p.status !== "found" ? p.status : "found", ev:[...f.ev, ...(p ? p.ev.filter(e => e.src === "plan") : [])] }; }
+  for(const [id, p] of Object.entries(prev)) if(!next[id] && p.ev.some(e => e.src === "plan")) next[id] = { ...p, ev:p.ev.filter(e => e.src === "plan") };
+  S.skills = next;
+}
+function matchOpp(o){
+  let tot = 0, got = 0; const have = [], miss = [];
+  for(const [id, core] of o.req){ const w = core ? 2 : 1; tot += w; if(owned(id)){ got += w; have.push({id, core}); } else miss.push({id, core}); }
+  miss.sort((a,b) => b.core - a.core);
+  return { score: Math.round(got/tot*100), have, miss };
+}
+function buildSteps(){
+  const o = opp(S.target), gaps = S.planSkills.slice(0,3), n = gaps.length, steps = [];
+  if(n){ const span = Math.floor(21/n);
+    gaps.forEach((id,k) => { const s = k*span + 1, e = (k+1)*span, l2 = s + Math.max(1, Math.round(span*.4)) - 1;
+      steps.push({ key:id+":learn", kind:"learn", skill:id, d1:s, d2:l2 }, { key:id+":practice", kind:"practice", skill:id, d1:l2+1, d2:e-1 }, { key:id+":prove", kind:"prove", skill:id, d1:e, d2:e }); }); }
+  steps.push({ key:"project", kind:"project", d1:22, d2:27 }, { key:"interview", kind:"interview", d1:28, d2:29 }, { key:"apply", kind:"apply", d1:30, d2:30 });
+  return steps.map(s => ({ ...s, week: Math.min(4, Math.ceil(s.d1/7)) }));
+}
+function stepText(st){
+  const o = opp(S.target), x = st.skill ? skName(st.skill) : "", Lr = LEARN[st.skill];
+  if(st.kind === "learn") return Lr ? tx(Lr.learn) : t("gen_learn",{x});
+  if(st.kind === "practice") return Lr ? tx(Lr.practice) : t("gen_practice",{x});
+  if(st.kind === "prove") return Lr ? tx(Lr.prove) : t("gen_prove",{x});
+  if(st.kind === "project") return tx(o.project);
+  if(st.kind === "interview") return t("st_interview");
+  return t("st_apply",{org:o.org});
+}
+function addProof(id, text, key){
+  const s = S.skills[id] || (S.skills[id] = { id, status:"confirmed", conf:"high", ev:[] });
+  s.status = "confirmed"; s.ev.push({ src:"plan", text, key });
+}
+function undoProof(key){
+  for(const [id, s] of Object.entries(S.skills)){ s.ev = s.ev.filter(e => e.key !== key); if(!s.ev.length) delete S.skills[id]; }
+}
+const proofCount = () => Object.values(S.skills).reduce((a,s) => a + s.ev.filter(e => e.src === "plan").length, 0);
+const ACTION_RE = /\b(led|built|sold|launched|negotiat\w*|coordinat\w*|organi[sz]ed|grew|increased|managed|served|presented|raised)\b|lancé|coordonn|vendu|négoci|organisé|présenté|géré|augmenté|نسقت|أطلقت|بعت|تفاوضت|نظمت|قدمت|ارتفع|رفعت|جمعنا|اقترحت/i;
+function scoreAnswer(ans, o){
+  const words = ans.trim().split(/\s+/).filter(Boolean).length;
+  const clarity = Math.round(words < 12 ? 25 + words*2 : words <= 110 ? Math.min(100, 55 + words*.8) : Math.max(60, 100 - (words-110)*.5));
+  const hasNum = /\d/.test(ans), act = ACTION_RE.test(ans);
+  const evidence = Math.round(Math.min(100, (hasNum ? 50 : 12) + (act ? 35 : 0) + Math.min(15, words/6)));
+  const rel = o.req.filter(([id]) => (HINT[id] && HINT[id].test(ans)) || ans.toLowerCase().includes(skName(id).toLowerCase())).length;
+  const relevance = Math.min(100, 28 + rel*24);
+  const tip = words < 25 ? "i_tip_short" : !hasNum ? "i_tip_num" : rel < 1 ? "i_tip_rel" : "i_tip_good";
+  return { clarity, evidence, relevance, total: Math.round((clarity+evidence+relevance)/3), tip };
+}
+function ivQuestion(i){
+  const o = opp(S.target), gaps = (S.planSkills.length ? S.planSkills : [o.req[0][0]]).slice(0,2).map(skName);
+  return fmt(t("q")[i], { role: tx(o.title), gap: list(gaps) });
+}
+function suggestion(i){
+  const o = opp(S.target), tpl = t("sug")[i];
+  const evs = [...new Set(Object.values(S.skills).filter(s => s.status === "confirmed").flatMap(s => s.ev.filter(e => e.src === "words").map(e => e.text)))];
+  let out;
+  if(i === 0){ const req = o.req.map(r => r[0]).filter(owned); const pool = req.length ? req : Object.keys(S.skills).filter(owned);
+    out = fmt(tpl, { name: S.profile.name || "Yassir", e1: evs[0] || "", e2: evs[1] || "", role: tx(o.title), skills: list(pool.slice(0,3).map(skName)) }); }
+  else if(i === 1){ const n = S.skills.negotiation; const e = n && n.status === "confirmed" ? ((n.ev.find(x => x.src === "words") || {}).text || "") : ""; out = fmt(tpl, { e }); }
+  else { const g = S.planSkills[0] || o.req[0][0], Lr = LEARN[g];
+    out = fmt(tpl, { learn: Lr ? tx(Lr.learn) : t("gen_learn",{x:skName(g)}), practice: Lr ? tx(Lr.practice) : t("gen_practice",{x:skName(g)}), prove: Lr ? tx(Lr.prove) : t("gen_prove",{x:skName(g)}) }); }
+  return out.replace(/\s+/g," ").trim();
+}
+
+/* =====================================================================
+   6. Navigation
+   ===================================================================== */
+const ORDER = ["welcome","profile","story","analysis","passport","match","gap","plan","interview","ready"];
+const STATION = { profile:0, story:0, analysis:1, passport:1, match:2, gap:3, plan:4, interview:5, ready:6 };
+const STATION_SCREEN = ["profile","passport","match","gap","plan","interview","ready"];
+function resolve(n){
+  if(["gap","plan","interview","ready"].includes(n) && !S.target) n = "match";
+  if(n === "match" && !confirmedCount()) n = Object.keys(S.skills).length ? "passport" : "story";
+  if(n === "passport" && !Object.keys(S.skills).length) n = S.story.text.trim() ? "story" : "profile";
+  if(n === "analysis" && !S.story.text.trim()) n = "story";
+  if(n === "story" && !S.profile.name.trim()) n = "profile";
+  return n;
+}
+function go(name){
+  name = resolve(name);
+  const dir = ORDER.indexOf(name) >= ORDER.indexOf(S.screen) ? 1 : -1;
+  S.screen = name; if(STATION[name] != null) S.max = Math.max(S.max, STATION[name]); save(); paint(dir);
+}
+function paint(dir=1, instant=false){
+  document.body.dataset.screen = S.screen; chrome();
+  const main = $("#main"), old = main.firstElementChild;
+  const mount = () => {
+    main.innerHTML = `<section class="screen ${instant ? "fade" : "enter"}" style="--d:${dir}">${VIEW[S.screen]()}</section>`;
+    if(!instant) window.scrollTo(0,0);
+    const h = $("#main h1"); if(h){ h.setAttribute("tabindex","-1"); h.focus({preventScroll:true}); }
+    (AFTER[S.screen] || (() => {}))();
+  };
+  if(old && !instant && !RM()){ old.classList.remove("enter","fade"); old.style.setProperty("--d", dir); old.classList.add("leave"); setTimeout(mount, 170); } else mount();
+}
+function chrome(){
+  const l = L(); document.documentElement.lang = l; document.documentElement.dir = l === "ar" ? "rtl" : "ltr"; document.title = t("title");
+  $("#proto").textContent = t("proto");
+  $("#logo").setAttribute("aria-label", t("home"));
+  $("#logo").innerHTML = `${mark()}<b>BAWSALA</b><span class="ar-n" lang="ar">بوصلة</span>`;
+  const lg = $("#langs"); lg.setAttribute("aria-label", t("lang"));
+  lg.innerHTML = ["ar","fr","en"].map(c => `<button data-act="lang" data-v="${c}" lang="${c}" aria-pressed="${c===l}">${{ar:"عربي",fr:"FR",en:"EN"}[c]}</button>`).join("");
+  $("#reset").innerHTML = ic("refresh") + `<span class="sr">${esc(t("reset"))}</span>`; $("#reset").title = t("reset");
+  const cur = STATION[S.screen], st = t("st");
+  $("#spine").setAttribute("aria-label", t("nav"));
+  $("#spine").innerHTML = `<ol>${st.map((lab,i) => `<li class="${i < S.max || (i===6 && S.applied) ? "done" : ""} ${i===cur ? "now" : ""} ${i <= S.max ? "lit" : ""}"><button data-act="station" data-v="${i}" ${i > S.max ? "disabled" : ""} ${i===cur ? 'aria-current="step"' : ""}><span class="dot"></span><span class="lbl">${esc(lab)}</span></button></li>`).join("")}</ol>`;
+  const c = cur == null ? 0 : cur;
+  $("#mprog").innerHTML = `<div class="mp-bar" aria-hidden="true"><i style="width:${(c+1)/7*100}%"></i></div><span>${esc(t("step_of",{a:c+1,b:7}))} · ${esc(st[c])}</span>`;
+}
+
+/* =====================================================================
+   7. Views — each screen: one statement, one object, one action
+   ===================================================================== */
+const words = (s, start) => s.split(" ").map((w,i) => `<span class="w" style="--i:${start+i}">${esc(w)}</span>`).join(" ");
+function dial(){
+  let ticks = ""; for(let i=0;i<72;i++){ const a = i*5*Math.PI/180, big = i%6===0, r1 = big ? 164 : 172, r2 = 182;
+    ticks += `<line class="tk${big?" big":""}" x1="${(200+r1*Math.sin(a)).toFixed(1)}" y1="${(200-r1*Math.cos(a)).toFixed(1)}" x2="${(200+r2*Math.sin(a)).toFixed(1)}" y2="${(200-r2*Math.cos(a)).toFixed(1)}"/>`; }
+  return `<svg viewBox="0 0 400 400"><defs><radialGradient id="glow"><stop offset="0" stop-color="#19E6C1" stop-opacity=".18"/><stop offset="1" stop-color="#19E6C1" stop-opacity="0"/></radialGradient></defs>
+  <circle class="d-glow" cx="200" cy="200" r="200"/><circle class="d-ring" cx="200" cy="200" r="190"/><g>${ticks}</g><circle class="d-orbit" cx="200" cy="200" r="132"/>
+  <g class="sway"><g class="needle" id="needle"><line x1="200" y1="140" x2="200" y2="52"/><circle cx="200" cy="52" r="6"/></g></g>
+  <g class="d-mark" transform="translate(152 150) scale(3)"><path class="bowl" pathLength="100" d="M5.5 12.6v1.6a10.5 10.5 0 0 0 21 0v-1.6"/><circle class="mdot" cx="16" cy="6.4" r="2.8"/></g></svg>`;
+}
+const VIEW = {};
+VIEW.welcome = () => {
+  const n1 = t("w_t1").split(" ").length, n2 = t("w_t2").split(" ").length;
+  return `<div class="hero">
+    <div class="dial" aria-hidden="true">${dial()}</div>
+    <div class="hero-copy">
+      <p class="kicker rise" style="--i:0">${esc(t("w_kicker"))}</p>
+      <h1 class="display">${words(t("w_t1"),1)} <em>${words(t("w_t2"),1+n1)}</em> ${words(t("w_t3"),1+n1+n2)}</h1>
+      <p class="lede rise" style="--i:12">${esc(t("w_lede"))}</p>
+      <div class="ctas rise" style="--i:14">
+        <button class="btn primary xl magnetic" data-act="start">${esc(t("w_start"))}${ic("arrow")}</button>
+        <button class="btn ghost xl" data-act="demo">${ic("play")}${esc(t("w_demo"))}</button>
+      </div>
+      <ol class="loop rise" style="--i:16">${t("w_loop").map(x => `<li>${esc(x)}</li>`).join("")}</ol>
+    </div></div>`;
+};
+VIEW.profile = () => {
+  const p = S.profile;
+  return `<div class="narrow">
+    <p class="kicker">${esc(t("p_kicker"))}</p><h1 class="h1">${esc(t("p_title"))}</h1><p class="sub">${esc(t("p_sub"))}</p>
+    <div class="panel stack" style="margin-top:44px">
+      <div><label class="label" for="f-name">${esc(t("p_name"))}</label>
+        <input class="input" id="f-name" data-bind="name" value="${esc(p.name)}" autocomplete="given-name" placeholder="${esc(t("p_name_ph"))}" aria-describedby="name-err">
+        <p class="err" id="name-err" hidden role="alert">${ic("alert")}${esc(t("p_err_name"))}</p></div>
+      <fieldset><legend class="label">${esc(t("p_stage"))}</legend>
+        <div class="chips">${Object.entries(t("stages")).map(([k,v]) => `<button class="chip" data-act="stage" data-v="${k}" aria-pressed="${p.stage===k}">${esc(v)}</button>`).join("")}</div></fieldset>
+      <div><label class="label" for="f-field">${esc(t("p_field"))}</label>
+        <input class="input" id="f-field" data-bind="field" value="${esc(p.field)}" placeholder="${esc(t("p_field_ph"))}"></div>
+      <fieldset><legend class="label">${esc(t("p_langs"))}</legend>
+        <div class="chips">${Object.entries(t("langs")).map(([k,v]) => `<button class="chip" data-act="spoken" data-v="${k}" aria-pressed="${p.langs.includes(k)}">${esc(v)}</button>`).join("")}</div>
+        <p class="hint">${esc(t("p_langs_hint"))}</p></fieldset>
+    </div>
+    <div class="actions"><button class="btn ghost" data-act="goto" data-v="welcome">${ic("back")}${esc(t("back"))}</button>
+      <button class="btn primary lg" data-act="profile-next">${esc(t("cont"))}${ic("arrow")}</button></div></div>`;
+};
+VIEW.story = () => `<div class="narrow">
+    <p class="kicker">${esc(t("s_kicker"))}</p><h1 class="h1">${esc(t("s_title"))}</h1><p class="sub">${esc(t("s_sub"))}</p>
+    <div class="panel stack" style="margin-top:44px">
+      <fieldset><legend class="label">${esc(t("s_type"))}</legend>
+        <div class="chips">${Object.entries(t("types")).map(([k,v]) => `<button class="chip" data-act="stype" data-v="${k}" aria-pressed="${S.story.type===k}">${esc(v)}</button>`).join("")}</div></fieldset>
+      <div><div class="row between" style="margin-bottom:10px"><label class="label" for="f-story" style="margin:0">${esc(t("s_label"))}</label>
+          <button class="btn link" data-act="example">${ic("spark")}${esc(t("s_example"))}</button></div>
+        <textarea class="textarea" id="f-story" data-bind="story" maxlength="1200" placeholder="${esc(t("s_ph"))}" aria-describedby="meter-l story-err">${esc(S.story.text)}</textarea>
+        <div class="meter" id="meter" data-band="thin"><div class="bar"><i></i></div><p id="meter-l" aria-live="polite"></p></div>
+        <p class="hint">${esc(t("s_hint"))}</p>
+        <p class="err" id="story-err" hidden role="alert">${ic("alert")}${esc(t("s_err"))}</p></div>
+    </div>
+    <div class="actions"><button class="btn ghost" data-act="goto" data-v="profile">${ic("back")}${esc(t("back"))}</button>
+      <button class="btn primary lg magnetic" data-act="story-go">${ic("spark")}${esc(t("s_go"))}</button></div></div>`;
+VIEW.analysis = () => {
+  let txt = esc(S.story.text); const terms = new Set();
+  for(const re of Object.values(HINT)){ const m = S.story.text.match(re); if(m) terms.add(esc(m[0])); }
+  [...terms].sort((a,b) => b.length - a.length).forEach(w => { const i = txt.indexOf(w); if(i >= 0 && !/<mark[^>]*>[^<]*$/.test(txt.slice(0,i))) txt = txt.slice(0,i) + `<mark>${w}</mark>` + txt.slice(i+w.length); });
+  return `<div>
+    <p class="kicker">${esc(t("a_kicker"))}</p><h1 class="h1">${esc(t("a_title"))}</h1>
+    <div class="panel scan" aria-hidden="true"><div class="scanline"></div><p class="scan-text">${txt}</p></div>
+    <div class="an-grid">
+      <ol class="stages" id="stages">${t("a_stages").map((s,i) => `<li class="${i===0?"on":""}"><span class="st">${ic("check")}</span><span>${esc(s)}</span></li>`).join("")}</ol>
+      <div><p class="label">${esc(t("a_found"))}</p><div class="found" id="found" aria-live="polite"></div></div>
+    </div>
+    <p class="note">${ic("info")}<span>${esc(t("a_note"))}</span></p></div>`;
+};
+function evHTML(sk){
+  const e = sk.ev.find(x => x.src === "words") || sk.ev[0];
+  if(e.src === "words"){ const i = e.text.indexOf(e.hl); return i < 0 ? esc(e.text) : esc(e.text.slice(0,i)) + `<mark>${esc(e.hl)}</mark>` + esc(e.text.slice(i+e.hl.length)); }
+  if(e.src === "type") return esc(t("ev_type",{ type: t("types")[S.story.type] }));
+  if(e.src === "lang") return esc(t("ev_lang",{ list: list(S.profile.langs.map(l => t("langs")[l])) }));
+  return esc(e.text);
+}
+function confHTML(sk){
+  const src = sk.ev.every(e => e.src === "plan") ? "plan" : sk.ev[0].src === "lang" ? "lang" : sk.conf;
+  const n = src === "med" ? 2 : 3;
+  return `<p class="conf"><span class="pips" aria-hidden="true">${[1,2,3].map(i => `<i class="${i<=n?"on":""}"></i>`).join("")}</span>${esc(t({high:"pp_conf_high",med:"pp_conf_med",lang:"pp_conf_lang",plan:"pp_conf_plan"}[src]))}</p>`;
+}
+function skCard(sk, i=0){
+  const nm = esc(skName(sk.id));
+  const acts = sk.status === "found"
+    ? `<button class="btn sm ghost" data-act="sk" data-v="removed" data-id="${sk.id}">${ic("x")}${esc(t("pp_no"))}</button><button class="btn sm primary" data-act="sk" data-v="confirmed" data-id="${sk.id}">${ic("check")}${esc(t("pp_yes"))}</button>`
+    : sk.status === "confirmed" ? `<button class="btn sm ghost" data-act="sk" data-v="removed" data-id="${sk.id}">${ic("x")}${esc(t("pp_no"))}</button>`
+    : `<button class="btn sm ghost" data-act="sk" data-v="found" data-id="${sk.id}">${ic("refresh")}${esc(t("pp_restore"))}</button>`;
+  return `<li class="sk ${sk.status}" data-id="${sk.id}" style="--i:${i}">
+    <h3>${nm}</h3>${RARE.has(sk.id) ? `<span class="tag">${ic("spark")}${esc(t("pp_rare"))}</span>` : ""}
+    <blockquote class="ev">${evHTML(sk)}</blockquote>${confHTML(sk)}
+    <div class="sk-act">${acts}</div><span class="sk-check" aria-hidden="true">${ic("check")}</span></li>`;
+}
+const passNo = () => "BW-" + String(Math.abs([...(S.profile.name || "x")].reduce((a,c) => a*31 + c.charCodeAt(0), 7)) % 900000 + 100000);
+VIEW.passport = () => {
+  const all = Object.values(S.skills).sort((a,b) => (RARE.has(b.id) - RARE.has(a.id)) || ((a.conf === "med") - (b.conf === "med")));
+  if(!all.length) return `<div class="narrow"><p class="kicker">${esc(t("pp_kicker"))}</p><h1 class="h1">${esc(t("pp_empty_t"))}</h1><p class="sub">${esc(t("pp_empty_d"))}</p>
+    <div class="actions"><button class="btn primary lg" data-act="goto" data-v="story">${ic("back")}${esc(t("pp_empty_cta"))}</button></div></div>`;
+  const c = confirmedCount(), p = S.profile;
+  return `<div>
+    <div class="pp-head">
+      <div><p class="kicker">${esc(t("pp_kicker"))}</p><h1 class="h1">${esc(t("pp_title",{N:nSkills(all.length)}))}</h1><p class="sub">${esc(t("pp_sub"))}</p></div>
+      <article class="pcard tilt" aria-label="${esc(t("pp_id"))}">
+        <span class="pc-mark">${mark(2)}</span>
+        <div><p class="pc-id">${esc(t("pp_id"))} · <bdi>${passNo()}</bdi></p><p class="pc-name">${esc(p.name)}</p>
+          <p class="pc-meta">${esc([t("stages")[p.stage], p.field].filter(Boolean).join(" · "))}</p></div>
+        <div class="pc-n"><b id="pc-n" class="num">0</b><span>${esc(t("pp_of",{b:all.length}))}</span></div>
+      </article>
+    </div>
+    <ul class="skills" id="skills">${all.map(skCard).join("")}</ul>
+    <div class="dock"><p class="grow" id="pp-count">${t("pp_count",{a:c,b:all.length})}</p>
+      <button class="btn ghost" data-act="confirm-all">${ic("check")}${esc(t("pp_all"))}</button>
+      <button class="btn primary" data-act="goto" data-v="match" id="pp-next" ${c ? "" : "disabled"}>${esc(t("pp_go"))}${ic("arrow")}</button></div></div>`;
+};
+VIEW.match = () => {
+  const rows = OPPS.map(o => ({ o, m: matchOpp(o) })).sort((a,b) => b.m.score - a.m.score);
+  return `<div>
+    <p class="kicker">${esc(t("m_kicker"))}</p><h1 class="h1">${esc(t("m_title"))}</h1><p class="sub">${esc(t("m_sub"))}</p>
+    <div class="opps">${rows.map(({o,m},i) => { const core = m.have.filter(h => h.core); const tg = S.target === o.id;
+      return `<article class="opp tilt ${tg?"is-target":""}" style="--i:${i}">
+        <div class="opp-top"><span class="org" aria-hidden="true">${o.ini}</span>
+          <div class="opp-h"><p>${esc(o.org)} · ${esc(tx(o.city))}</p><h3>${esc(tx(o.title))}</h3></div>${ring(m.score, 72)}</div>
+        <p class="why">${esc(core.length ? t("m_why",{skills:list(core.map(h => skName(h.id)))}) : t("m_why_low"))}</p>
+        <div class="mini" aria-label="${esc(t("m_cover",{a:m.have.length,b:o.req.length}))}">${m.have.map(h => `<span class="h">${ic("check")}${esc(skName(h.id))}</span>`).join("")}${m.miss.map(g => `<span class="g">${ic("plus")}${esc(skName(g.id))}</span>`).join("")}</div>
+        <div class="opp-foot"><span class="pay"><bdi dir="ltr">${esc(o.pay)}</bdi></span><span class="otype">${esc(t("otypes")[o.type])} · ${esc(t("m_cover",{a:m.have.length,b:o.req.length}))}</span>
+          <button class="btn sm ${tg?"amber":"ghost"}" data-act="aim" data-v="${o.id}">${esc(tg ? t("m_aim") : t("m_pick"))}${ic("arrow")}</button></div>
+      </article>`; }).join("")}</div></div>`;
+};
+VIEW.gap = () => {
+  const o = opp(S.target), m = matchOpp(o), n = m.miss.length;
+  const order = [...m.have.map(x => ({...x, h:1})), ...m.miss.map(x => ({...x, h:0}))];
+  return `<div>
+    <div class="gap-head"><div><p class="kicker">${esc(t("g_kicker"))}</p>
+        <h1 class="h1">${esc(n ? t("g_title",{N:nSkills(n)}) : t("g_title0"))}</h1>
+        <p class="sub">${esc(t("g_sub",{role:tx(o.title),org:o.org}))}</p></div>
+      <div class="gap-ring">${ring(m.score, 170)}<span>${esc(t("g_ready"))}</span></div></div>
+    <div class="ladder" role="img" aria-label="${esc(t("m_cover",{a:m.have.length,b:o.req.length}))}">${order.map((x,i) => `<i class="seg ${x.h?"have":""} ${x.core?"core":""}" style="flex:${x.core?2:1};--i:${i}"><span>${esc(skName(x.id))}</span></i>`).join("")}</div>
+    <div class="gap-cols">
+      <section><h2>${esc(t("g_have"))}</h2><ul class="glist">${m.have.map(x => `<li class="h"><span class="mk">${ic("check")}</span><span class="nm">${esc(skName(x.id))}</span>${x.core ? `<span class="key">${esc(t("g_key"))}</span>` : ""}</li>`).join("") || `<li class="g"><span class="nm" style="color:var(--t3)">—</span></li>`}</ul></section>
+      <section><h2>${esc(t("g_build"))}</h2><ul class="glist">${m.miss.map(x => `<li class="g"><span class="mk">${ic("plus")}</span><span class="nm">${esc(skName(x.id))}</span>${x.core ? `<span class="key">${esc(t("g_key"))}</span>` : ""}</li>`).join("") || `<li class="h"><span class="mk">${ic("check")}</span><span class="nm">${esc(t("g_title0"))}</span></li>`}</ul></section>
+    </div>
+    <div class="actions"><button class="btn ghost" data-act="goto" data-v="match">${ic("back")}${esc(t("g_change"))}</button>
+      <button class="btn primary lg magnetic" data-act="goto" data-v="plan">${esc(t("g_go"))}${ic("arrow")}</button></div></div>`;
+};
+const KIND_IC = { learn:"book", practice:"tool", prove:"file", project:"target", interview:"mic", apply:"send" };
+function stepHTML(st){
+  const done = !!S.done[st.key], text = stepText(st);
+  const day = st.d1 === st.d2 ? t("r_day",{a:st.d1}) : t("r_days",{a:st.d1,b:st.d2});
+  const hrs = st.kind === "learn" && LEARN[st.skill] ? ` · ${t("r_hours",{n:LEARN[st.skill].h})}` : "";
+  let extra = "";
+  if(st.kind === "prove" || st.kind === "project") extra = `<p class="prove-note">${ic("spark")}${esc(t("r_prove_note"))}</p>`;
+  if(st.kind === "interview") extra = `<button class="btn sm ${done?"ghost":"primary"}" data-act="goto" data-v="interview">${ic("mic")}${esc(t("r_open"))}</button>`;
+  if(st.kind === "apply") extra = `<button class="btn sm ${S.applied?"ghost":"amber"}" data-act="goto" data-v="ready">${esc(t("r_see"))}${ic("arrow")}</button>`;
+  const tick = st.kind === "interview" || st.kind === "apply"
+    ? `<span class="tick" aria-hidden="true" style="cursor:default">${ic("check")}</span>`
+    : `<button class="tick" data-act="step" data-v="${st.key}" aria-pressed="${done}" aria-label="${esc(t("kinds")[st.kind])}: ${esc(text)}">${ic("check")}</button>`;
+  return `<li class="step k-${st.kind} ${done?"done":""}" data-key="${st.key}">${tick}
+    <div><p class="step-meta">${ic(KIND_IC[st.kind])}${esc(t("kinds")[st.kind])}${st.skill ? " · " + esc(skName(st.skill)) : ""} · <bdi>${esc(day)}</bdi>${esc(hrs)}</p>
+      <p class="step-t">${esc(text)}</p>${extra}</div></li>`;
+}
+function planProgress(){ const steps = buildSteps(); return { steps, done: steps.filter(s => S.done[s.key]).length }; }
+VIEW.plan = () => {
+  const o = opp(S.target), m = matchOpp(o), { steps, done } = planProgress();
+  if(S.startScore == null) S.startScore = m.score;
+  const weeks = [1,2,3,4].map(w => steps.filter(s => s.week === w)).map((ss,i) => ss.length ? `<section class="panel week"><h2>${esc(t("r_week",{n:i+1}))}</h2><ol class="steps">${ss.map(stepHTML).join("")}</ol></section>` : "").join("");
+  return `<div>
+    <p class="kicker">${esc(t("r_kicker"))}</p><h1 class="h1">${esc(t("r_title",{a:S.startScore}))}</h1><p class="sub">${esc(t("r_sub"))}</p>
+    <div class="plan-grid">
+      <aside class="plan-aside"><div class="panel">
+        <p class="label" style="color:var(--t2);font-weight:500">${esc(t("r_readiness",{role:tx(o.title)}))}</p>
+        <p class="r-num"><bdi class="num" id="r-num">${m.score}</bdi><small>%</small></p>
+        <div class="r-bar"><i id="r-bar" style="width:${m.score}%"></i></div>
+        <div class="r-meta"><span id="r-steps">${t("r_steps",{a:done,b:steps.length})}</span><span>${t("r_start",{a:S.startScore})}</span></div>
+        <button class="btn primary btn-block" style="width:100%;margin-top:22px" data-act="goto" data-v="interview">${ic("mic")}${esc(t("r_go"))}</button>
+      </div></aside>
+      <div>${weeks}</div>
+    </div></div>`;
+};
+function bubble(q, i, typing){
+  const o = opp(S.target);
+  return `<div class="bub rec" data-q="${i}"><p class="who"><span class="av">${mark(2.4)}</span>${esc(t("i_rec",{org:o.org}))} · ${esc(t("i_q",{a:i+1,b:3}))}</p>
+    ${typing ? `<span class="dots" role="status" aria-label="${esc(t("i_typing"))}"><i></i><i></i><i></i></span><p class="qt" hidden>${esc(q)}</p>` : `<p class="qt">${esc(q)}</p>`}</div>`;
+}
+function feedback(s, anim){
+  return `<div class="fb ${anim?"anim":""}"><div class="fb-top"><b class="num">${s.total}</b><span>/100</span></div>
+    ${["clarity","evidence","relevance"].map(k => `<div class="fb-row"><span>${esc(t("i_scores")[k])}</span><div class="bar"><i style="--w:${s[k]}%"></i></div><b>${s[k]}</b></div>`).join("")}
+    <p class="fb-tip">${ic("spark")}<span>${esc(t(s.tip))}</span></p></div>`;
+}
+function chatHTML(animLast){
+  let h = ""; const n = S.iv.answers.length;
+  for(let i=0;i<=S.iv.cur;i++){
+    h += bubble(ivQuestion(i), i, i === S.iv.cur && ui.seenQ < i && n === i);
+    if(i < n) h += `<div class="bub you" aria-label="${esc(t("i_ans"))}">${esc(S.iv.answers[i])}</div>` + feedback(S.iv.scores[i], animLast && i === n-1);
+  }
+  return h;
+}
+function composerHTML(){
+  const n = S.iv.answers.length;
+  if(n === S.iv.cur) return `<label class="sr" for="f-ans">${esc(t("i_ans"))}</label>
+    <textarea class="textarea" id="f-ans" placeholder="${esc(t("i_ph"))}"></textarea>
+    <p class="err" id="ans-err" hidden role="alert">${ic("alert")}${esc(t("i_err"))}</p>
+    <div class="row"><button class="btn link" data-act="suggest">${ic("spark")}${esc(t("i_suggest"))}</button>
+      <button class="btn primary lg" data-act="answer">${ic("send")}${esc(t("i_send"))}</button></div>`;
+  if(S.iv.cur < 2) return `<div class="row" style="justify-content:flex-end"><button class="btn primary lg" data-act="next-q">${esc(t("i_next"))}${ic("arrow")}</button></div>`;
+  return `<div class="row" style="justify-content:flex-end"><button class="btn primary lg magnetic" data-act="finish-iv">${esc(t("i_finish"))}${ic("arrow")}</button></div>`;
+}
+VIEW.interview = () => {
+  const o = opp(S.target);
+  return `<div class="narrow">
+    <p class="kicker">${esc(t("i_kicker"))}</p><h1 class="h1">${esc(t("i_title"))}</h1><p class="sub">${esc(t("i_sub",{role:tx(o.title)}))}</p>
+    <div class="chat" id="chat" aria-live="polite">${chatHTML(false)}</div>
+    <div class="composer" id="composer">${composerHTML()}</div></div>`;
+};
+VIEW.ready = () => {
+  const o = opp(S.target), m = matchOpp(o), hi = m.score >= 80;
+  const iv = S.iv.scores.length ? Math.round(S.iv.scores.reduce((a,s) => a + s.total, 0) / S.iv.scores.length) : null;
+  return `<div>
+    <div class="ready-hero"><p class="kicker">${esc(t("y_kicker"))}</p>
+      <p class="big" aria-label="${m.score}% ${esc(t("y_readiness"))}"><bdi id="y-num">0</bdi><small>%</small></p>
+      <h1 class="h1">${esc(hi ? t("y_title_hi",{role:tx(o.title)}) : t("y_title_lo"))}</h1>
+      <p class="sub">${esc(hi ? t("y_sub_hi") : t("y_sub_lo"))}</p></div>
+    <div class="stats">
+      <div><b class="num" data-n="${confirmedCount()}">0</b><span>${esc(t("y_skills"))}</span></div>
+      <div><b class="num" data-n="${proofCount()}">0</b><span>${esc(t("y_proofs"))}</span></div>
+      <div><b class="num" ${iv == null ? "" : `data-n="${iv}"`}>${iv == null ? "—" : "0"}</b><span>${esc(t("y_interview"))}</span></div></div>
+    <article class="opp final is-target" style="--i:0">
+      <div class="opp-top"><span class="org" aria-hidden="true">${o.ini}</span><div class="opp-h"><p>${esc(o.org)} · ${esc(tx(o.city))}</p><h3>${esc(tx(o.title))}</h3></div></div>
+      <div class="opp-foot" style="margin-top:0"><span class="pay"><bdi dir="ltr">${esc(o.pay)}</bdi></span><span class="otype">${esc(t("otypes")[o.type])}</span>
+        <button class="btn lg amber magnetic" data-act="apply" ${S.applied ? "disabled" : ""}>${S.applied ? ic("check") + esc(t("y_applied_btn")) : esc(t("y_apply")) + ic("arrow")}</button></div></article>
+    <div class="impact"><div class="tenone" aria-hidden="true">${Array.from({length:10}, (_,i) => `<i style="--i:${i}"></i>`).join("")}<i class="arr"></i><i class="one"></i></div><p>${esc(t("y_impact"))}</p></div>
+    <div class="actions"><button class="btn ghost" data-act="goto" data-v="plan">${ic("back")}${esc(t("y_plan"))}</button>
+      <button class="btn ghost" data-act="goto" data-v="passport">${esc(t("y_passport"))}</button></div></div>`;
+};
+
+/* =====================================================================
+   8. After-mount behaviour
+   ===================================================================== */
+const AFTER = {};
+AFTER.welcome = () => {
+  const dialEl = $(".dial"), needle = $("#needle"); if(!dialEl || !needle) return;
+  const onMove = e => { if(!document.body.contains(needle)) return window.removeEventListener("pointermove", onMove);
+    const r = dialEl.getBoundingClientRect(), dx = e.clientX - (r.left + r.width/2), dy = e.clientY - (r.top + r.height/2);
+    needle.style.setProperty("--a", (Math.atan2(dx, -dy) * 180 / Math.PI).toFixed(1) + "deg"); };
+  if(matchMedia("(hover:hover)").matches && !RM()) window.addEventListener("pointermove", onMove, { passive:true });
+};
+function updateMeter(){
+  const el = $("#meter"); if(!el) return;
+  const text = S.story.text, w = text.trim().split(/\s+/).filter(Boolean).length;
+  const hints = Object.values(HINT).filter(re => re.test(text)).length;
+  const score = Math.min(100, Math.round(w/60*45 + hints*7 + (/\d/.test(text) ? 8 : 0)));
+  const band = score < 34 ? "thin" : score < 68 ? "ok" : "rich", d = t("det")[band];
+  el.dataset.band = band; $("i", el).style.width = Math.max(4, score) + "%";
+  $("#meter-l").innerHTML = `<b>${esc(d[0])}</b> ${esc(d[1])}`;
+}
+AFTER.story = () => { updateMeter(); if(ui.autoplay){ ui.autoplay = false; setTimeout(() => typeInto($("#f-story"), EXAMPLE[L()], () => setTimeout(() => ACT["story-go"](), 450)), 500); } };
+AFTER.analysis = () => {
+  const run = ++ui.runId, alive = () => run === ui.runId && S.screen === "analysis";
+  const found = analyze(), ids = Object.keys(found).sort((a,b) => RARE.has(a) - RARE.has(b));
+  const fast = RM(), stages = $$("#stages li"), marks = $$(".scan-text mark"), box = $("#found");
+  const stageMs = fast ? 120 : 950;
+  marks.forEach((m,i) => setTimeout(() => alive() && m.classList.add("lit"), fast ? 0 : 300 + i*210));
+  ids.forEach((id,i) => setTimeout(() => { if(!alive()) return; const s = document.createElement("span"); s.className = "pill"; s.innerHTML = `<i></i>${esc(skName(id))}`; box.append(s); }, fast ? 0 : stageMs + i*170));
+  stages.forEach((li,i) => setTimeout(() => { if(!alive()) return; stages.forEach((x,k) => x.className = k < i ? "ok" : k === i ? "on" : ""); }, i*stageMs));
+  setTimeout(() => { if(!alive()) return; stages.forEach(x => x.className = "ok"); merge(found); save(); setTimeout(() => alive() && go("passport"), fast ? 50 : 650); }, stages.length*stageMs);
+};
+AFTER.passport = () => { countUp($("#pc-n"), 0, confirmedCount(), 900); bindTilt(); };
+AFTER.match = () => { drawRings($("#main")); bindTilt(); };
+AFTER.gap = () => drawRings($("#main"));
+AFTER.interview = () => revealQuestion();
+AFTER.ready = () => {
+  const o = opp(S.target), m = matchOpp(o);
+  countUp($("#y-num"), 0, m.score, 1600);
+  $$(".stats [data-n]").forEach(b => countUp(b, 0, +b.dataset.n, 1200));
+  if(!S.done.apply && S.applied) S.done.apply = true;
+};
+function revealQuestion(){
+  const b = $$("#chat .dots").pop(); if(!b) return;
+  const q = S.iv.cur;
+  setTimeout(() => { const host = b.parentElement; if(!document.body.contains(host)) return; b.remove(); const p = $(".qt", host); p.hidden = false; p.style.animation = "fadeIn .4s ease"; ui.seenQ = q; const a = $("#f-ans"); a && a.focus({preventScroll:true}); }, RM() ? 0 : 1100);
+}
+function bindTilt(){
+  if(RM() || !matchMedia("(hover:hover)").matches) return;
+  $$(".tilt").forEach(el => {
+    el.addEventListener("pointermove", e => { const r = el.getBoundingClientRect(), x = (e.clientX - r.left)/r.width - .5, y = (e.clientY - r.top)/r.height - .5;
+      el.style.setProperty("--ry", (x*6).toFixed(2)+"deg"); el.style.setProperty("--rx", (-y*6).toFixed(2)+"deg"); });
+    el.addEventListener("pointerleave", () => { el.style.setProperty("--ry","0deg"); el.style.setProperty("--rx","0deg"); });
+  });
+}
+function refreshPassportCounts(){
+  const all = Object.keys(S.skills).length, c = confirmedCount();
+  const el = $("#pp-count"); if(el) el.innerHTML = t("pp_count",{a:c,b:all});
+  const n = $("#pc-n"); if(n) countUp(n, +n.textContent || 0, c, 500);
+  const nx = $("#pp-next"); if(nx) nx.disabled = !c;
+}
+
+/* =====================================================================
+   9. Actions
+   ===================================================================== */
+const ACT = {
+  home: () => go("welcome"),
+  goto: el => go(el.dataset.v),
+  station: el => go(STATION_SCREEN[+el.dataset.v]),
+  lang: el => { S.lang = el.dataset.v; save(); paint(0, true); },
+  reset: () => { const lang = S.lang; S = blank(); S.lang = lang; ui.seenQ = -1; ui.runId++; save(); go("welcome"); toast(t("toast_reset")); },
+  start: () => go(S.profile.name.trim() ? "story" : "profile"),
+  demo: () => {
+    const lang = S.lang; S = blank(); S.lang = lang; ui.seenQ = -1;
+    S.profile = { name:"Yassir", stage:"final", field: DEMO_FIELD[L()], langs:["ar","dar","fr","en"] };
+    S.story = { type:"family", text:"" }; S.max = 0; ui.autoplay = true; save(); go("story");
+  },
+  stage: el => { S.profile.stage = el.dataset.v; save(); $$('[data-act="stage"]').forEach(b => b.setAttribute("aria-pressed", b === el)); },
+  spoken: el => { const v = el.dataset.v, a = S.profile.langs; S.profile.langs = a.includes(v) ? a.filter(x => x !== v) : [...a, v]; save(); el.setAttribute("aria-pressed", S.profile.langs.includes(v)); },
+  "profile-next": () => {
+    if(!S.profile.name.trim()){ $("#name-err").hidden = false; $("#f-name").setAttribute("aria-invalid","true"); $("#f-name").focus(); return; }
+    go("story");
+  },
+  stype: el => { S.story.type = el.dataset.v; save(); $$('[data-act="stype"]').forEach(b => b.setAttribute("aria-pressed", b === el)); },
+  example: () => { S.story.type = "family"; $$('[data-act="stype"]').forEach(b => b.setAttribute("aria-pressed", b.dataset.v === "family")); typeInto($("#f-story"), EXAMPLE[L()]); },
+  "story-go": () => {
+    const w = S.story.text.trim().split(/\s+/).filter(Boolean).length;
+    if(w < 12){ const e = $("#story-err"); if(e){ e.hidden = false; $("#f-story").focus(); } return; }
+    go("analysis");
+  },
+  sk: el => {
+    const id = el.dataset.id, st = el.dataset.v, li = el.closest(".sk"); S.skills[id].status = st; save();
+    const tmp = document.createElement("ul"); tmp.innerHTML = skCard(S.skills[id], 0); const nl = tmp.firstElementChild;
+    nl.style.animation = "none"; if(st === "confirmed") nl.classList.add("stamp");
+    li.replaceWith(nl); ($("button", nl) || nl).focus({preventScroll:true});
+    if(st === "confirmed") burst($(".sk-check", nl));
+    refreshPassportCounts();
+  },
+  "confirm-all": () => {
+    Object.values(S.skills).forEach(s => { if(s.status === "found") s.status = "confirmed"; }); save();
+    $$("#skills .sk").forEach((li,i) => { const tmp = document.createElement("ul"); tmp.innerHTML = skCard(S.skills[li.dataset.id], i); const nl = tmp.firstElementChild; nl.style.animation = "none"; li.replaceWith(nl); setTimeout(() => nl.classList.add("stamp"), i*40); });
+    refreshPassportCounts(); $("#pp-next").focus();
+  },
+  aim: el => {
+    const id = el.dataset.v;
+    if(S.target !== id){ const m = matchOpp(opp(id)); S.target = id; S.planSkills = m.miss.map(x => x.id); S.startScore = m.score; S.done = {}; S.iv = { cur:0, answers:[], scores:[] }; S.applied = false; ui.seenQ = -1;
+      S.max = Math.min(S.max, 3); }
+    go("gap");
+  },
+  step: el => {
+    const key = el.dataset.v, st = buildSteps().find(s => s.key === key); if(!st) return;
+    const o = opp(S.target), before = matchOpp(o).score, was = !!S.done[key];
+    if(was){ delete S.done[key]; if(st.kind === "prove" || st.kind === "project") undoProof(key); }
+    else { S.done[key] = true;
+      if(st.kind === "prove") addProof(st.skill, stepText(st), key);
+      if(st.kind === "project") o.req.filter(r => r[1] && owned(r[0])).forEach(r => addProof(r[0], stepText(st), key)); }
+    save();
+    const after = matchOpp(o).score, li = el.closest(".step");
+    const tmp = document.createElement("ol"); tmp.innerHTML = stepHTML(st); const nl = tmp.firstElementChild; li.replaceWith(nl); $(".tick", nl).focus({preventScroll:true});
+    const { steps, done } = planProgress();
+    $("#r-steps").innerHTML = t("r_steps",{a:done,b:steps.length});
+    $("#r-bar").style.width = after + "%"; countUp($("#r-num"), before, after, 1000);
+    if(!was && (st.kind === "prove" || st.kind === "project")){ burst($(".tick", nl)); if(st.kind === "prove") toast(t("r_toast",{x:skName(st.skill),a:before,b:after})); }
+  },
+  suggest: () => typeInto($("#f-ans"), suggestion(S.iv.cur)),
+  answer: () => {
+    const a = $("#f-ans"), v = a.value.trim();
+    if(v.split(/\s+/).filter(Boolean).length < 3){ $("#ans-err").hidden = false; a.focus(); return; }
+    S.iv.answers.push(v); S.iv.scores.push(scoreAnswer(v, opp(S.target))); ui.seenQ = S.iv.cur; save();
+    $("#chat").innerHTML = chatHTML(true); $("#composer").innerHTML = composerHTML();
+    const fb = $$("#chat .fb").pop(); fb && fb.scrollIntoView({ behavior: RM() ? "auto" : "smooth", block:"center" });
+    const b = $("#composer button"); b && b.focus({preventScroll:true});
+  },
+  "next-q": () => { S.iv.cur = Math.min(2, S.iv.cur + 1); save(); $("#chat").innerHTML = chatHTML(false); $("#composer").innerHTML = composerHTML(); revealQuestion();
+    $$("#chat .bub.rec").pop().scrollIntoView({ behavior: RM() ? "auto" : "smooth", block:"center" }); },
+  "finish-iv": () => { S.done.interview = true; save(); go("ready"); },
+  apply: el => { S.applied = true; S.done.apply = true; save(); burst(el); el.disabled = true; el.innerHTML = ic("check") + esc(t("y_applied_btn")); toast(t("y_applied",{org:opp(S.target).org})); chrome(); }
+};
+
+/* =====================================================================
+   10. Wiring
+   ===================================================================== */
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-act]"); if(!el || el.disabled) return;
+  const fn = ACT[el.dataset.act]; if(fn){ e.preventDefault(); fn(el, e); }
+});
+document.addEventListener("input", e => {
+  const b = e.target.dataset && e.target.dataset.bind; if(!b) return;
+  if(b === "story"){ S.story.text = e.target.value; updateMeter(); const er = $("#story-err"); if(er) er.hidden = true; }
+  else { S.profile[b] = e.target.value; if(b === "name"){ $("#name-err").hidden = true; e.target.removeAttribute("aria-invalid"); } }
+  clearTimeout(ui.saveT); ui.saveT = setTimeout(save, 250);
+});
+document.addEventListener("keydown", e => {
+  if(e.key === "Enter" && e.target.id === "f-name"){ e.preventDefault(); ACT["profile-next"](); }
+  if(e.key === "Enter" && (e.metaKey || e.ctrlKey)){ if(e.target.id === "f-story") ACT["story-go"](); if(e.target.id === "f-ans") ACT.answer(); }
+});
+/* Magnetic CTAs — the primary action leans toward the pointer. */
+document.addEventListener("pointermove", e => {
+  if(RM() || !matchMedia("(hover:hover)").matches) return;
+  const m = e.target.closest && e.target.closest(".magnetic");
+  $$(".magnetic").forEach(b => { if(b !== m) b.style.translate = ""; });
+  if(m){ const r = m.getBoundingClientRect(); m.style.translate = `${((e.clientX - r.left - r.width/2) * .18).toFixed(1)}px ${((e.clientY - r.top - r.height/2) * .28).toFixed(1)}px`; }
+}, { passive:true });
+
+/* Boot */
+if(S.screen === "analysis") S.screen = Object.keys(S.skills).length ? "passport" : "story";
+S.screen = S.screen === "welcome" ? "welcome" : resolve(S.screen);
+paint(0, true);
+})();
+</script>
+</body>
+</html>
