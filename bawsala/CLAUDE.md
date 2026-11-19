@@ -57,13 +57,14 @@ Postgres on Neon (Frankfurt) with the auth already in the repo — do NOT migrat
 Free tiers only for hosting/DB/monitoring. AI ≤ 200 MAD/month (~$20): default model Claude Haiku 5.5 for extraction; larger models only
 in offline evals, never in production. Hard caps in code: $1/day and $20/month; on cap → offline reader fallback, never an error page.
 
-## Commands (fill in once the repo is scaffolded)
-- Install: `pnpm install`
-- Dev: `pnpm dev`
-- Typecheck / lint: `pnpm typecheck` / `pnpm lint`
-- Tests: `pnpm test` (unit) · `pnpm test:e2e` · `pnpm test:rls` · `pnpm test:a11y`
-- DB: use the migration commands already defined in package.json (read them during /audit-existing and write them here)
-- Evals: `pnpm eval <prompt-name>`
+## Commands (this repo uses npm; filled in by /audit-existing on 2026-11-19)
+- Install: `npm ci`
+- Dev: `npm run dev`
+- Typecheck / lint: `npm run typecheck` / `npm run lint`
+- Tests: `npm test` (unit + integration, includes the isolation tests) · `npm run test:unit` · `npm run test:integration` · `npm run test:e2e` (Playwright desktop + mobile, includes axe)
+- DB: `npm run db:migrate` · `npm run db:seed` · `npm run kb:ingest` (or all three: `npm run setup`)
+- Evals: `npm run eval:ai` (the extract-skills eval on the legacy sets is still to be added)
+- Deploy build (Vercel): `bash scripts/vercel-build.sh`
 
 ## Design
 Design reference: `docs/design/skilma-prototype.html` (open it in a browser; every screen of the pilot is there: home with live try,
