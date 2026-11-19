@@ -43,3 +43,6 @@ next-env.d.ts
 # embedding model weights (fetched by scripts/fetch-embedding-model.ts, never committed)
 /models
 !.env.example
+
+# Claude Code personal settings
+.claude/settings.local.json
