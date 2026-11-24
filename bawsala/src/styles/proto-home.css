@@ -914,3 +914,6 @@ html[data-theme=dark] .bwh .p-lv-stamp, html[data-theme=dark] .bwh .p-engine.p-i
 @keyframes lsmove{to{transform:translateX(-100%)}}
 @keyframes lsmove-r{to{transform:translateX(100%)}}
 @keyframes rvblur{0%{opacity:0;transform:translateY(8px);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
+/* Accessibility override (not in the prototype): inactive story cards in greyscale instead of 55% opacity. */
+.bwh .p-lv-card { opacity: 1; filter: grayscale(1) }
+.bwh .p-lv.p-s1 .p-lv-a, .bwh .p-lv.p-s2 .p-lv-b, .bwh .p-lv.p-s3 .p-lv-c { filter: none }

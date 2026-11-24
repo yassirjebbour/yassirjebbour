@@ -24,13 +24,20 @@ severity and a reason it was left.
 | K10 | When a crowded constellation (more than about 10 skills on one side) tightens its label rows, a label can sit a little away from its star. Labels never overlap and never leave the sky (unit test). | Low | A leader line would need new SVG work. |
 | K11 | On wide screens, admin and institution users see the student navigation items in the rail as well as their portal link. | Low | Baseline behaviour (the shell is shared); not changed in this recovery. |
 
-## Open release blocker (added 2026-11-24)
+## Release blockers resolved on 2026-11-24
+
+| # | Issue | Resolution |
+|---|---|---|
+| K12 | E2E accessibility test failed on `/`: logo "DM" at 2.09:1 in a hero story card dimmed to 0.55 opacity. | **Fixed in the element, test unchanged** (founder decision B). Inactive cards are shown in greyscale at full opacity; the logo now measures ≥ 7.46:1. E2E desktop 4/4 twice, full suite 5/5. See `HOMEPAGE_VERIFICATION_REPORT.md` §6. |
+| — | PR #1 lint failure | Kit files in `docs/legacy/` are ignored by ESLint. |
+| — | Build refused (Next.js 16.4.3 security advisories) | Upgraded to 16.4.6. |
+
+## Open, release process
 
 | # | Issue | Severity | Status |
 |---|---|---|---|
-| K12 | E2E `accessibility: no serious or critical axe violations on key pages` fails on `/`: one `color-contrast` node, the logo "DM" in the hero story's third card (2.09:1) while that card is dimmed to 0.55 opacity during steps 1–2. The original prototype does the same (measured). This is the only failing release check: lint, typecheck, tests, build and `eval:ai` pass. | P0 for CI (blocks a green PR) | Needs a founder decision. (A) Exclude the decorative story stage from the axe contrast rule, with the WCAG 1.4.3 "incidental text" reason. (B) Change the dimming. Or replace the homepage with the SKILMA design, which drops this animation. Details: `HOMEPAGE_VERIFICATION_REPORT.md` §6. |
-
-Resolved on 2026-11-24: the PR #1 lint failure (kit files in `docs/legacy/` are now ignored by ESLint) and the build refusal (Next.js 16.4.3 security advisories; upgraded to 16.4.6).
+| K13 | PR #1 targets `claude/mobile-repair-os-kpcoqi` in `yassirjebbour/yassirjebbour`, the default branch of the unrelated Repair OS project. | P0 for merging | **Do not merge** until the founder decides the SKILMA repository and base branch (founder condition, 2026-11-24). |
+| K14 | The hero story's 0.45 s cross-fade between loops can be caught mid-fade by an accessibility scan started at that moment (text disappearing, not displayed). | Low | Not observed in any E2E run; disappears when the homepage is rebuilt from the SKILMA design. |
 
 ## Test-environment notes
 

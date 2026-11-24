@@ -11,17 +11,21 @@
   - `eslint.config.mjs` ignores `docs/legacy/**`;
   - `next` and `eslint-config-next` upgraded to 16.4.6 (lockfile: only those 12 package entries changed;
     `npm audit --omit=dev` reports 0 vulnerabilities).
-- **Verified locally, CI order:** lint 0 problems, typecheck, 97/97 tests, build, `eval:ai` all pass. E2E desktop: 3
-  passed, 1 failed (K12).
-- **Single next task:** make the E2E accessibility test pass on `/` (K12).
-  - The cause is the dimmed card in the old BAWSALA hero animation (logo "DM" at 2.09:1 while the card is at 0.55
-    opacity).
-  - The founder must choose: (A) scope the axe rule to exclude the decorative story stage (`role="img"`, WCAG 1.4.3
-    incidental text), or (B) change the inactive-card dimming.
-  - The founder already decided the homepage will be replaced by the SKILMA design (`docs/design/skilma-prototype.html`),
-    which removes this animation. Do not weaken the test without that decision.
-- **Then:** follow `AUDIT_2026-11-19.md` §7 (rename to SKILMA and drop Tamazight, AI on Haiku 5.5 with the $1/day and
-  $20/month caps, magic-link sign-in, design port).
+- **Then fixed K12 (founder decision B: fix the contrast in the element, never weaken the test).**
+  - Hero story cards not reached yet are now greyscale at full opacity, instead of 55% opacity. This is an override in
+    `scripts/proto-home/extract.mjs`, and `src/styles/proto-home.css` was regenerated.
+  - Rendered logo contrast is now ≥ 12.06:1 light and ≥ 7.46:1 dark (was 2.09:1).
+- **Verified locally, CI order:** lint 0 problems, typecheck, 97/97 tests, build, E2E desktop 4/4 (twice), full E2E
+  5/5, `eval:ai` all pass.
+- **Founder conditions (2026-11-24):**
+  1. Accessibility is fixed in the product, never by excluding or weakening a test.
+  2. **Do not merge PR #1** until the SKILMA repository and base branch are confirmed (K13).
+- **Single next task:** `AUDIT_2026-11-19.md` §7 step 2:
+  - rename BAWSALA → SKILMA in all UI, emails and the manifest;
+  - remove Tamazight from `LOCALES` and the UI;
+  - replace the visible "demo" wording with "example" (keep `data_status`).
+  This is the prerequisite for the homepage redesign from `docs/design/skilma-prototype.html` (§7 step 5), which the
+  founder confirmed comes next within the SKILMA plan.
 
 ---
 

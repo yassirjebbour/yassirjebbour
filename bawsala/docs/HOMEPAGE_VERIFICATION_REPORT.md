@@ -55,6 +55,7 @@ How it is built: [`HOMEPAGE_RESTORATION_SPEC.md`](HOMEPAGE_RESTORATION_SPEC.md).
 | 8 | Sound effects not ported; confetti not used on the homepage | Off by default in the prototype; not part of the homepage |
 | 9 | Accessible names of the language buttons and the brand start with their visible text ("EN — English") | WCAG 2.5.3 (Label in Name). Nothing visible changes |
 | 10 | Prototype CSS is scoped to the homepage (`.bwh`); language selectors also match the app's codes `ary` and `zgh-Tfng`; fonts are the same files served from `/fonts` | Technical: keeps the rest of the app unaffected |
+| 11 | Hero story cards not reached yet are shown in greyscale at full opacity, instead of at 55% opacity | WCAG 1.4.3: the faded logo measured 2.09:1; now ≥ 7.46:1 (owner decision B, 2026-11-24) |
 
 ## 4. Defects found and fixed during this verification
 
@@ -71,9 +72,20 @@ How it is built: [`HOMEPAGE_RESTORATION_SPEC.md`](HOMEPAGE_RESTORATION_SPEC.md).
 | `vitest` (unit + integration) | 91 / 91 pass |
 | `next build` | Pass |
 | axe, homepage, 5 languages × light/dark × desktop/mobile (all rules), dev server | 19 / 20 clean. zgh desktop: `label-content-name-mismatch` on the brand. The name does contain the visible text; axe joins the two spans without a space |
-| Playwright E2E (production build) | **4 passed, 1 failed** — see §6 |
+| Playwright E2E (production build) | **4 passed, 1 failed** at first; **all pass since 2026-11-24** (desktop 4/4 twice, full suite 5/5), see §6 |
 
-## 6. Open item: needs the owner's decision
+## 6. Resolved on 2026-11-24: hero contrast (owner chose option B)
+
+The owner chose to fix the contrast in the element itself, without excluding or weakening the accessibility test.
+- **Change:** an accessibility override appended by `scripts/proto-home/extract.mjs` (`A11Y_OVERRIDES`). Cards not reached yet keep full opacity and are shown in greyscale, with the prototype's own smaller scale. A card regains its colour when the story reaches it. The colour change is not animated.
+- **Measured (production build, 16 s of the story, rendered pixels):**
+  - lowest contrast of the "DM" logo while inactive: **12.06:1 light, 7.46:1 dark** (was 2.09:1);
+  - card opacity is never below 1.
+- **Tests:** E2E desktop **4/4 passed twice**; full suite **5/5**; the axe result for `/` is empty.
+- **Remaining transient:** the 0.45 s cross-fade between two loops of the story (`p-out`) can be caught mid-fade by a scan started at that exact moment. Text there is disappearing, not displayed for reading. The E2E test scans after animations settle and passed in every run.
+- **Deviation added:** row 11 of §3.
+
+### Original analysis (before the decision)
 
 **Failed test:** `accessibility: no serious or critical axe violations` — one `color-contrast` node on `/`, and only on `/`.
 

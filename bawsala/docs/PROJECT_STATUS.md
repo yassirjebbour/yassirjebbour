@@ -5,11 +5,13 @@
 > Since the module table below was written: the old BAWSALA homepage was rebuilt, AI cost accounting was fixed, a
 > Vercel + Neon deploy was prepared, the SKILMA kit was added and audited (`AUDIT_2026-11-19.md`).
 >
-> **Release checks (local run, 2026-11-24, CI order):** lint PASS · typecheck PASS · tests PASS (97/97) · build PASS
-> (Next.js upgraded 16.4.3 → 16.4.6 for two security advisories) · E2E desktop **3 passed, 1 failed** (one
-> color-contrast node on `/`, see `KNOWN_ISSUES.md` K12) · `eval:ai` PASS (rules engine precision 0.943, recall 0.98).
-> CI on PR #1 had failed at lint, then would have failed at build. Both are fixed; CI now stops at the E2E step.
-> Nothing is deployed. The AI model has never run (no API key).
+> **Release checks (local runs, 2026-11-24, CI order): all pass.**
+> - lint, typecheck, tests (97/97) and build pass. Next.js was upgraded 16.4.3 → 16.4.6 for two security advisories.
+> - E2E desktop 4/4, run twice; full suite 5/5. The `/` contrast failure is fixed in the element; the test is unchanged.
+> - `eval:ai` passes (rules engine precision 0.943, recall 0.98).
+>
+> **Merge is blocked by K13:** the PR's base branch belongs to Repair OS. Nothing is deployed. The AI model has never
+> run (no API key).
 >
 > The table below is the module status of 2026-11-02; the SKILMA week-1 gaps are listed in `AUDIT_2026-11-19.md` §6.
 
