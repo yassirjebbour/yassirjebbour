@@ -24,6 +24,14 @@ severity and a reason it was left.
 | K10 | When a crowded constellation (more than about 10 skills on one side) tightens its label rows, a label can sit a little away from its star. Labels never overlap and never leave the sky (unit test). | Low | A leader line would need new SVG work. |
 | K11 | On wide screens, admin and institution users see the student navigation items in the rail as well as their portal link. | Low | Baseline behaviour (the shell is shared); not changed in this recovery. |
 
+## Open release blocker (added 2026-11-24)
+
+| # | Issue | Severity | Status |
+|---|---|---|---|
+| K12 | E2E `accessibility: no serious or critical axe violations on key pages` fails on `/`: one `color-contrast` node, the logo "DM" in the hero story's third card (2.09:1) while that card is dimmed to 0.55 opacity during steps 1–2. The original prototype does the same (measured). This is the only failing release check: lint, typecheck, tests, build and `eval:ai` pass. | P0 for CI (blocks a green PR) | Needs a founder decision. (A) Exclude the decorative story stage from the axe contrast rule, with the WCAG 1.4.3 "incidental text" reason. (B) Change the dimming. Or replace the homepage with the SKILMA design, which drops this animation. Details: `HOMEPAGE_VERIFICATION_REPORT.md` §6. |
+
+Resolved on 2026-11-24: the PR #1 lint failure (kit files in `docs/legacy/` are now ignored by ESLint) and the build refusal (Next.js 16.4.3 security advisories; upgraded to 16.4.6).
+
 ## Test-environment notes
 
 | # | Note |

@@ -1,5 +1,32 @@
 # Next-session handoff
 
+## Latest session — 2026-11-24 (SKILMA)
+
+- **Branch** `claude/bawsala-home-restoration` (PR #1 on `yassirjebbour/yassirjebbour`; the PR's base branch belongs to
+  the unrelated Repair OS project, do not merge it as is). App folder `bawsala/`; the product name is SKILMA.
+- **Read first:** `CLAUDE.md` (SKILMA kit rules), `docs/AUDIT_2026-11-19.md`, `docs/WEEK1_PLAN.md`, `docs/DECISIONS.md`.
+- **Done this session:** PR #1 CI was red at `npm run lint` (2 errors in `docs/legacy/evals/eval_reader.js`, kit reference
+  files) and the build was refused by Next.js (`SecurityFatalError`, advisories GHSA-mfr8-8qww-v76h and
+  GHSA-vc7v-qv4w-wrv8). Fixed:
+  - `eslint.config.mjs` ignores `docs/legacy/**`;
+  - `next` and `eslint-config-next` upgraded to 16.4.6 (lockfile: only those 12 package entries changed;
+    `npm audit --omit=dev` reports 0 vulnerabilities).
+- **Verified locally, CI order:** lint 0 problems, typecheck, 97/97 tests, build, `eval:ai` all pass. E2E desktop: 3
+  passed, 1 failed (K12).
+- **Single next task:** make the E2E accessibility test pass on `/` (K12).
+  - The cause is the dimmed card in the old BAWSALA hero animation (logo "DM" at 2.09:1 while the card is at 0.55
+    opacity).
+  - The founder must choose: (A) scope the axe rule to exclude the decorative story stage (`role="img"`, WCAG 1.4.3
+    incidental text), or (B) change the inactive-card dimming.
+  - The founder already decided the homepage will be replaced by the SKILMA design (`docs/design/skilma-prototype.html`),
+    which removes this animation. Do not weaken the test without that decision.
+- **Then:** follow `AUDIT_2026-11-19.md` §7 (rename to SKILMA and drop Tamazight, AI on Haiku 5.5 with the $1/day and
+  $20/month caps, magic-link sign-in, design port).
+
+---
+
+## Earlier handoff (2026-11-02)
+
 Read this first, then `PROJECT_STATUS.md` and `MAXIMUM_ENGINEERING_GAP_REGISTER.md`.
 
 ## Where things are

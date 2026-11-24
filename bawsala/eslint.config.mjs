@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Reference material from the SKILMA kit (minified legacy prototype and its eval scripts): read and extracted
+    // from, never part of the app build.
+    "docs/legacy/**",
   ]),
 ]);
 
