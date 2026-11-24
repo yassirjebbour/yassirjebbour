@@ -1,0 +1,47 @@
+name: BAWSALA CI
+on:
+  push:
+    paths: ["bawsala/**", ".github/workflows/bawsala-ci.yml"]
+  pull_request:
+    paths: ["bawsala/**", ".github/workflows/bawsala-ci.yml"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: bawsala } }
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env: { POSTGRES_USER: postgres, POSTGRES_PASSWORD: postgres, POSTGRES_DB: postgres }
+        ports: ["5432:5432"]
+        options: --health-cmd "pg_isready -U postgres" --health-interval 5s --health-retries 20
+    env:
+      TEST_DATABASE_URL: postgres://bawsala:bawsala@localhost:5432/bawsala_test
+      E2E_DATABASE_URL: postgres://bawsala:bawsala@localhost:5432/bawsala_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: bawsala/package-lock.json }
+      - name: Create app role (non-superuser, so RLS is enforced) and test database
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE ROLE bawsala LOGIN PASSWORD 'bawsala' CREATEDB"
+          PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE bawsala_test OWNER bawsala"
+          PGPASSWORD=postgres psql -h localhost -U postgres -d bawsala_test -c "CREATE EXTENSION vector; CREATE EXTENSION pg_trgm;"
+      - run: npm ci
+      - name: Cache embedding model
+        uses: actions/cache@v4
+        with: { path: bawsala/models, key: e5-small-q8-f80102d3 }
+      - run: npm run models:fetch
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test --project=desktop
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with: { name: playwright-traces, path: bawsala/test-results }
+      - name: Retrieval & extraction evaluation report
+        run: DATABASE_URL=$TEST_DATABASE_URL npm run eval:ai
+      - uses: actions/upload-artifact@v4
+        with: { name: ai-eval, path: bawsala/docs/eval }

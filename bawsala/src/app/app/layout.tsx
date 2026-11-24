@@ -1,0 +1,10 @@
+import type { Metadata } from "next";
+import { requireUser } from "@/server/auth/current";
+import { AppShell } from "@/components/app/shell";
+
+export const metadata: Metadata = { robots: { index: false, follow: false } };
+
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  const user = await requireUser();
+  return <AppShell user={user}>{children}</AppShell>;
+}
